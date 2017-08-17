@@ -1,9 +1,5 @@
 package grafana
 
-import (
-	"context"
-)
-
 type DashboardID uint64
 
 type Dashboard struct {
@@ -27,29 +23,4 @@ type Row struct {
 }
 
 type Panel struct {
-}
-
-type DashboardsService struct {
-	client *Client
-}
-
-func NewDashboardsService(client *Client) *DashboardsService {
-	return &DashboardsService{
-		client: client,
-	}
-}
-
-func (ds *DashboardsService) Search(ctx context.Context) ([]*Dashboard, error) {
-	req, err := ds.client.NewRequest(ctx, "GET", "/api/search", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var dashboards []*Dashboard
-	_, err = ds.client.Do(req, &dashboards)
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, nil
 }
