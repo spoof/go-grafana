@@ -26,15 +26,14 @@ var ErrDashboardNotFound = errors.New("Dashboard not found")
 //
 // Grafana API docs: http://docs.grafana.org/http_api/dashboard/#get-dashboard
 func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, error) {
-	u := "/api/dashboards/db/" + slug
+	u := fmt.Sprintf("/api/dashboards/db/%s", slug)
 	req, err := ds.client.NewRequest(ctx, "GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var d Dashboard
-	resp, err := ds.client.Do(req, &d)
-	if err != nil {
+	if resp, err := ds.client.Do(req, &d); err != nil {
 		if resp != nil {
 			if resp.StatusCode == http.StatusNotFound {
 				return nil, ErrDashboardNotFound
