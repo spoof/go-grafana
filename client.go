@@ -71,6 +71,13 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		resp.Body.Close()
 	}()
 
+	err = CheckResponse(resp)
+	if err != nil {
+		// even though there was an error, we still return the response
+		// in case the caller wants to inspect it further
+		return resp, err
+	}
+
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
 			io.Copy(w, resp.Body)
@@ -83,6 +90,17 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	return resp, err
+}
+
+// CheckResponse checks the API response for errors, and returns them if
+// present. A response is considered an error if it has a status code outside
+// the 200 range.
+func CheckResponse(r *http.Response) error {
+	if c := r.StatusCode; 200 <= c && c <= 299 {
+		return nil
+	}
+
+	return fmt.Errorf("Response error: %d", r.StatusCode)
 }
 
 // addOptions adds the parameters in opt as URL query parameters to s. opt

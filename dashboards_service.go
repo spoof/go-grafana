@@ -2,6 +2,8 @@ package grafana
 
 import (
 	"context"
+	"errors"
+	"net/http"
 )
 
 type DashboardsService struct {
@@ -12,6 +14,33 @@ func NewDashboardsService(client *Client) *DashboardsService {
 	return &DashboardsService{
 		client: client,
 	}
+}
+
+// ErrDashboardNotFound represents an error if dashboard not found.
+var ErrDashboardNotFound = errors.New("Dashboard not found")
+
+// Get fetches a dashboard by given slug.
+//
+// Grafana API docs: http://docs.grafana.org/http_api/dashboard/#get-dashboard
+func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, error) {
+	u := "/api/dashboards/db/" + slug
+	req, err := ds.client.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var d Dashboard
+	resp, err := ds.client.Do(req, &d)
+	if err != nil {
+		if resp != nil {
+			if resp.StatusCode == http.StatusNotFound {
+				return nil, ErrDashboardNotFound
+			}
+		}
+		return nil, err
+	}
+
+	return &d, nil
 }
 
 type DashboardSearchOptions struct {

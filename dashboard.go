@@ -8,6 +8,7 @@ type Dashboard struct {
 	GraphTooltip uint8       `json:"graphTooltip"`
 	HideControls bool        `json:"hideControls"`
 	Rows         []*Row      `json:"rows"`
+	Slug         string      `json:"slug"`
 	Style        string      `json:"style"`
 	Timezone     string      `json:"timezone"`
 	Title        string      `json:"title"`
