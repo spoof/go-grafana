@@ -14,8 +14,22 @@ func NewDashboardsService(client *Client) *DashboardsService {
 	}
 }
 
-func (ds *DashboardsService) Search(ctx context.Context) ([]*DashboardHit, error) {
-	req, err := ds.client.NewRequest(ctx, "GET", "/api/search", nil)
+type DashboardSearchOptions struct {
+	Query     string   `url:"query,omitempty"`
+	Tags      []string `url:"tags,omitempty"`
+	IsStarred bool     `url:"starred,omitempty"`
+	Limit     int      `url:"limit,omitempty"`
+}
+
+func (ds *DashboardsService) Search(ctx context.Context, opt *DashboardSearchOptions) ([]*DashboardHit, error) {
+	u := "/api/search"
+
+	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := ds.client.NewRequest(ctx, "GET", u, nil)
 	if err != nil {
 		return nil, err
 	}

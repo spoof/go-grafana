@@ -20,7 +20,13 @@ func TestDashboardsService_Search(t *testing.T) {
 		fmt.Fprint(w, `[{"id": 1}, {"id": 2}]`)
 	})
 
-	dashboards, err := client.Dashboards.Search(context.Background())
+	opt := &DashboardSearchOptions{
+		Query:     "q",
+		Tags:      []string{"tag1", "tag2"},
+		IsStarred: true,
+		Limit:     10,
+	}
+	dashboards, err := client.Dashboards.Search(context.Background(), opt)
 	if err != nil {
 		t.Fatalf("Dashboards.Search returned error: %v", err)
 	}
