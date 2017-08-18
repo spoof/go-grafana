@@ -43,6 +43,8 @@ func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, 
 	return &d, nil
 }
 
+// DashboardSearchOptions specifies the optional parameters to the
+// DashboardsService.Search method.
 type DashboardSearchOptions struct {
 	Query     string   `url:"query,omitempty"`
 	Tags      []string `url:"tags,omitempty"`
@@ -50,6 +52,9 @@ type DashboardSearchOptions struct {
 	Limit     int      `url:"limit,omitempty"`
 }
 
+// Search searches dashboards with given criteria
+//
+//  Grafana API docs: http://docs.grafana.org/http_api/dashboard/#search-dashboards
 func (ds *DashboardsService) Search(ctx context.Context, opt *DashboardSearchOptions) ([]*DashboardHit, error) {
 	u := "/api/search"
 
@@ -72,6 +77,7 @@ func (ds *DashboardsService) Search(ctx context.Context, opt *DashboardSearchOpt
 	return hits, nil
 }
 
+// DashboardHit represents a found by DashboardsService.Search dashboard
 type DashboardHit struct {
 	ID        int64    `json:"id"`
 	Title     string   `json:"title"`

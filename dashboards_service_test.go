@@ -41,6 +41,8 @@ func TestDashboardsService_Search(t *testing.T) {
 	client := NewClient(baseURL, "", nil)
 
 	mux.HandleFunc("/api/search", func(w http.ResponseWriter, r *http.Request) {
+		// TODO: check querystring params here
+		testMethod(t, r, "GET")
 		fmt.Fprint(w, `[{"id": 1}, {"id": 2}]`)
 	})
 
