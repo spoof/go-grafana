@@ -3,13 +3,16 @@ package grafana
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 )
 
+// DashboardsService communicates with dashboard methods of the Grafana API.
 type DashboardsService struct {
 	client *Client
 }
 
+// NewDashboardsService returns a new DashboardsService.
 func NewDashboardsService(client *Client) *DashboardsService {
 	return &DashboardsService{
 		client: client,
