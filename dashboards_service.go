@@ -45,6 +45,25 @@ func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, 
 	return &d, nil
 }
 
+// Create a new dashboard.
+//
+// Grafana API docs: http://docs.grafana.org/http_api/dashboard/#create-update-dashboard
+func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, overwrite bool) (*Dashboard, error) {
+	u := "/api/dashboards/db"
+	req, err := ds.client.NewRequest(ctx, "POST", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var d Dashboard
+	if _, err := ds.client.Do(req, &d); err != nil {
+		// TODO: handle errors properly
+		return nil, err
+	}
+
+	return &d, nil
+}
+
 // DashboardSearchOptions specifies the optional parameters to the
 // DashboardsService.Search method.
 type DashboardSearchOptions struct {

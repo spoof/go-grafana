@@ -34,6 +34,31 @@ func TestDashboardsService_Get(t *testing.T) {
 
 }
 
+func TestDashboardsService_Create(t *testing.T) {
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	baseURL, _ := url.Parse(server.URL + "/")
+	client := NewClient(baseURL, "", nil)
+
+	mux.HandleFunc("/api/dashboards/db", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+		fmt.Fprint(w, `{"id": 1}`)
+	})
+
+	dashboard := &Dashboard{}
+	overwrite := false
+	d, err := client.Dashboards.Create(context.Background(), dashboard, overwrite)
+	if err != nil {
+		t.Fatalf("Dashboards.Create returned error: %v", err)
+	}
+
+	want := &Dashboard{ID: DashboardID(1)}
+	if !reflect.DeepEqual(d, want) {
+		t.Errorf("Dashboards.Create returned %+v, want %+v", d, want)
+	}
+
+}
+
 func TestDashboardsService_Search(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
