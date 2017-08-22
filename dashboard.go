@@ -42,13 +42,13 @@ func (d *Dashboard) Tags() []string {
 // SetTags sets new tags to dashboard
 func (d *Dashboard) SetTags(tags ...string) {
 	newTags := []string{}
-
 	uniqTags := make(map[string]bool)
 	for _, tag := range tags {
-		uniqTags[tag] = true
-	}
+		if _, ok := uniqTags[tag]; ok {
+			continue
+		}
 
-	for tag := range uniqTags {
+		uniqTags[tag] = true
 		newTags = append(newTags, tag)
 	}
 
