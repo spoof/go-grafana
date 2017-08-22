@@ -1,6 +1,7 @@
 package grafana
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -10,6 +11,10 @@ import (
 	"reflect"
 
 	"github.com/google/go-querystring/query"
+)
+
+const (
+	mediaTypeJSON = "application/json"
 )
 
 // A Client manages communication with the Grafana API.
@@ -38,23 +43,36 @@ func NewClient(baseURL *url.URL, token string, httpClient *http.Client) *Client 
 }
 
 // NewRequest creates an API request.
-func (c *Client) NewRequest(ctx context.Context, method string, urlStr string, body io.Reader) (*http.Request, error) {
+func (c *Client) NewRequest(ctx context.Context, method string, urlStr string, body interface{}) (*http.Request, error) {
 	relURL, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 	u := c.BaseURL.ResolveReference(relURL)
 
-	req, err := http.NewRequest(method, u.String(), body)
+	var buf io.ReadWriter
+	if body != nil {
+		buf = new(bytes.Buffer)
+		err = json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
 
+	req = req.WithContext(ctx)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.token))
 
 	if c.UserAgent != "" {
 		req.Header.Set("User-Agent", c.UserAgent)
+	}
+
+	if body != nil {
+		req.Header.Set("Content-Type", mediaTypeJSON)
 	}
 
 	return req, err
