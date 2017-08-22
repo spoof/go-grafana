@@ -1,5 +1,7 @@
 package grafana
 
+import "time"
+
 type DashboardID uint64
 
 type Dashboard struct {
@@ -13,6 +15,23 @@ type Dashboard struct {
 	Timezone     string      `json:"timezone"`
 	Title        string      `json:"title"`
 	tags         []string
+	Meta         *DashboardMeta
+}
+
+type DashboardMeta struct {
+	Slug    string `json:"slug"`
+	Type    string `json:"type"`
+	Version int    `json:"version"`
+
+	CanEdit bool `json:"canEdit"`
+	CanSave bool `json:"canSave"`
+	CanStar bool `json:"canStar"`
+
+	Created   time.Time `json:"created"`
+	CreatedBy string    `json:"createdBy"`
+	Expires   time.Time `json:"expires"`
+	Updated   time.Time `json:"updated"`
+	UpdatedBy string    `json:"updatedBy"`
 }
 
 // Tags is a getter for Dashboard tags field

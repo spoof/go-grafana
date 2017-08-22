@@ -32,8 +32,8 @@ func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, 
 		return nil, err
 	}
 
-	var d Dashboard
-	if resp, err := ds.client.Do(req, &d); err != nil {
+	var dResp dashboardGetResponse
+	if resp, err := ds.client.Do(req, &dResp); err != nil {
 		if resp != nil {
 			if resp.StatusCode == http.StatusNotFound {
 				return nil, ErrDashboardNotFound
@@ -42,7 +42,14 @@ func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, 
 		return nil, err
 	}
 
+	d := dResp.Dashboard
+	d.Meta = dResp.Meta
 	return &d, nil
+}
+
+type dashboardGetResponse struct {
+	Dashboard Dashboard      `json:"dashboard"`
+	Meta      *DashboardMeta `json:"meta"`
 }
 
 // Create a new dashboard.
@@ -55,13 +62,19 @@ func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, o
 		return nil, err
 	}
 
-	var d Dashboard
-	if _, err := ds.client.Do(req, &d); err != nil {
+	dReq := dashboardRequest{Dashboard: dashboard, Tags: dashboard.Tags()}
+	if _, err := ds.client.Do(req, &dReq); err != nil {
 		// TODO: handle errors properly
 		return nil, err
 	}
 
-	return &d, nil
+	dashboard.ID = dReq.Dashboard.ID
+	return dashboard, nil
+}
+
+type dashboardRequest struct {
+	*Dashboard
+	Tags []string `json:"tags"`
 }
 
 // DashboardSearchOptions specifies the optional parameters to the

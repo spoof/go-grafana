@@ -19,7 +19,7 @@ func TestDashboardsService_Get(t *testing.T) {
 	slug := "slug"
 	mux.HandleFunc("/api/dashboards/db/"+slug, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		fmt.Fprint(w, `{"id": 1}`)
+		fmt.Fprint(w, `{"dashboard": {"id": 1}}`)
 	})
 
 	d, err := client.Dashboards.Get(context.Background(), slug)
@@ -29,7 +29,7 @@ func TestDashboardsService_Get(t *testing.T) {
 
 	want := &Dashboard{ID: DashboardID(1)}
 	if !reflect.DeepEqual(d, want) {
-		t.Errorf("Dashboards.Get returned %+v, want %+v", d, want)
+		t.Errorf("Dashboards.Get\nreturned: %+v\nwant: %+v", d, want)
 	}
 
 }
@@ -54,7 +54,7 @@ func TestDashboardsService_Create(t *testing.T) {
 
 	want := &Dashboard{ID: DashboardID(1)}
 	if !reflect.DeepEqual(d, want) {
-		t.Errorf("Dashboards.Create returned %+v, want %+v", d, want)
+		t.Errorf("Dashboards.Create\nreturned: %+v\nwant: %+v", d, want)
 	}
 
 }
