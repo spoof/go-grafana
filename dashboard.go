@@ -1,16 +1,18 @@
 package grafana
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type DashboardID uint64
 
 type Dashboard struct {
-	ID           DashboardID `json:"id"`
+	ID           DashboardID `json:"id,omitempty"`
 	Editable     bool        `json:"editable"`
 	GraphTooltip uint8       `json:"graphTooltip"`
 	HideControls bool        `json:"hideControls"`
 	Rows         []*Row      `json:"rows"`
-	Slug         string      `json:"slug"`
 	Style        string      `json:"style"`
 	Timezone     string      `json:"timezone"`
 	Title        string      `json:"title"`
@@ -82,6 +84,17 @@ func (d *Dashboard) RemoveTags(tags ...string) {
 			d.tags = append(d.tags[:i], d.tags[i+1:]...)
 		}
 	}
+}
+
+func (d *Dashboard) MarshalJSON() ([]byte, error) {
+	type JSONDashboard Dashboard
+	return json.Marshal(&struct {
+		*JSONDashboard
+		Tags []string `json:"tags"`
+	}{
+		JSONDashboard: (*JSONDashboard)(d),
+		Tags:          d.Tags(),
+	})
 }
 
 type Row struct {
