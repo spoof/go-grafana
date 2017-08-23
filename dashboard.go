@@ -17,7 +17,7 @@ type Dashboard struct {
 	Timezone     string      `json:"timezone"`
 	Title        string      `json:"title"`
 	tags         []string
-	Meta         *DashboardMeta
+	Meta         *DashboardMeta `json:"meta,omitempty"`
 }
 
 type DashboardMeta struct {
@@ -88,11 +88,14 @@ func (d *Dashboard) RemoveTags(tags ...string) {
 
 func (d *Dashboard) MarshalJSON() ([]byte, error) {
 	type JSONDashboard Dashboard
+	dd := (*JSONDashboard)(d)
+	dd.Meta = nil
+
 	return json.Marshal(&struct {
 		*JSONDashboard
-		Tags []string `json:"tags"`
+		Tags []string `json:"tags,omitempty"`
 	}{
-		JSONDashboard: (*JSONDashboard)(d),
+		JSONDashboard: dd,
 		Tags:          d.Tags(),
 	})
 }
