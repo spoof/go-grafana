@@ -57,18 +57,20 @@ type dashboardGetResponse struct {
 // Grafana API docs: http://docs.grafana.org/http_api/dashboard/#create-update-dashboard
 func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, overwrite bool) (*Dashboard, error) {
 	u := "/api/dashboards/db"
-	req, err := ds.client.NewRequest(ctx, "POST", u, nil)
+
+	dReq := dashboardRequest{Dashboard: dashboard, Tags: dashboard.Tags()}
+	req, err := ds.client.NewRequest(ctx, "POST", u, dReq)
 	if err != nil {
 		return nil, err
 	}
 
-	dReq := dashboardRequest{Dashboard: dashboard, Tags: dashboard.Tags()}
-	if _, err := ds.client.Do(req, &dReq); err != nil {
+	var dResp Dashboard
+	if _, err := ds.client.Do(req, &dResp); err != nil {
 		// TODO: handle errors properly
 		return nil, err
 	}
 
-	dashboard.ID = dReq.Dashboard.ID
+	dashboard.ID = dResp.ID
 	return dashboard, nil
 }
 

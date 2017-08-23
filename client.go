@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -80,8 +81,16 @@ func (c *Client) NewRequest(ctx context.Context, method string, urlStr string, b
 
 // Do sends an API request and returns the API response.
 func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+	ctx := req.Context()
+
 	resp, err := c.client.Do(req)
 	if err != nil {
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		default:
+		}
+
 		return nil, err
 	}
 
@@ -91,8 +100,6 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 
 	err = CheckResponse(resp)
 	if err != nil {
-		// even though there was an error, we still return the response
-		// in case the caller wants to inspect it further
 		return resp, err
 	}
 
@@ -110,15 +117,32 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	return resp, err
 }
 
+type ErrorResponse struct {
+	Response *http.Response
+	Message  string
+}
+
+func (r *ErrorResponse) Error() string {
+	return fmt.Sprintf("%v %v: %v %+v",
+		r.Response.Request.Method, r.Response.Request.URL,
+		r.Response.StatusCode, r.Message)
+}
+
 // CheckResponse checks the API response for errors, and returns them if
 // present. A response is considered an error if it has a status code outside
-// the 200 range.
+// the 2xx range.
 func CheckResponse(r *http.Response) error {
 	if c := r.StatusCode; 200 <= c && c <= 299 {
 		return nil
 	}
 
-	return fmt.Errorf("Response error: %d", r.StatusCode)
+	errorResponse := ErrorResponse{Response: r}
+	data, err := ioutil.ReadAll(r.Body)
+	if err == nil {
+		errorResponse.Message = string(data)
+	}
+
+	return &errorResponse
 }
 
 // addOptions adds the parameters in opt as URL query parameters to s. opt
