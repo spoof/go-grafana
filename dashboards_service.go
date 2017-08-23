@@ -58,7 +58,7 @@ type dashboardGetResponse struct {
 func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, overwrite bool) (*Dashboard, error) {
 	u := "/api/dashboards/db"
 
-	dReq := dashboardRequest{Dashboard: dashboard}
+	dReq := dashboardCreateRequest{dashboard, overwrite}
 	req, err := ds.client.NewRequest(ctx, "POST", u, dReq)
 	if err != nil {
 		return nil, err
@@ -81,8 +81,9 @@ func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, o
 	return dashboard, nil
 }
 
-type dashboardRequest struct {
+type dashboardCreateRequest struct {
 	Dashboard *Dashboard `json:"dashboard"`
+	Overwrite bool       `json:"overwrite"`
 }
 
 // DashboardSearchOptions specifies the optional parameters to the
