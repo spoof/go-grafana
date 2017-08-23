@@ -67,6 +67,13 @@ func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, o
 	var dResp Dashboard
 	if _, err := ds.client.Do(req, &dResp); err != nil {
 		// TODO: handle errors properly
+		// 400 {"message":"Dashboard title cannot be empty", "error": ...}
+		// 404 {"status": "not-found", "message": err.Error()}
+		// 412 {"status": "name-exists", "message": err.Error()}
+		// 412 {"status": "version-mismatch", "message": err.Error()}
+		// 412 {"status": "plugin-dashboard", "message": message}
+		// 500 {"message": "failed to get quota", "error": ...}
+
 		return nil, err
 	}
 
