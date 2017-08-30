@@ -17,9 +17,10 @@ func TestDashboardsService_Get(t *testing.T) {
 	client := NewClient(baseURL, "", nil)
 
 	slug := "slug"
+	title := "title"
 	mux.HandleFunc("/api/dashboards/db/"+slug, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		fmt.Fprint(w, `{"dashboard": {"id": 1}}`)
+		fmt.Fprint(w, `{"dashboard": {"id": 1, "title": "`+title+`"}}`)
 	})
 
 	d, err := client.Dashboards.Get(context.Background(), slug)
@@ -27,7 +28,8 @@ func TestDashboardsService_Get(t *testing.T) {
 		t.Fatalf("Dashboards.Get returned error: %v", err)
 	}
 
-	want := &Dashboard{ID: DashboardID(1)}
+	want := NewDashboard(title)
+	want.ID = DashboardID(1)
 	if !reflect.DeepEqual(d, want) {
 		t.Errorf("Dashboards.Get\nreturned: %+v\nwant: %+v", d, want)
 	}
@@ -45,19 +47,22 @@ func TestDashboardsService_Save_New(t *testing.T) {
 		testMethod(t, r, "POST")
 		fmt.Fprint(w, `{"slug": "`+slug+`", "version": 1, "status": "success"}`)
 	})
+	title := "title"
 	mux.HandleFunc("/api/dashboards/db/"+slug, func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
-		fmt.Fprint(w, `{"dashboard": {"id": 1, "version": 2}}`)
+		fmt.Fprint(w, `{"dashboard": {"id": 1, "title": "`+title+`", "version": 2}}`)
 	})
 
-	d := &Dashboard{}
+	d := NewDashboard(title)
 	overwrite := false
 	err := client.Dashboards.Save(context.Background(), d, overwrite)
 	if err != nil {
 		t.Fatalf("Dashboards.Save returned error: %v", err)
 	}
 
-	want := &Dashboard{ID: DashboardID(1), Version: 2}
+	want := NewDashboard(title)
+	want.ID = DashboardID(1)
+	want.Version = 2
 	if !reflect.DeepEqual(d, want) {
 		t.Errorf("Dashboards.Save\nreturned: %+v\nwant: %+v", d, want)
 	}

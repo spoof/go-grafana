@@ -22,6 +22,13 @@ type Dashboard struct {
 	Meta         *DashboardMeta `json:"meta,omitempty"`
 }
 
+// NewDashboard creates new Dashboard.
+func NewDashboard(title string) *Dashboard {
+	return &Dashboard{
+		Title: title,
+	}
+}
+
 func (d *Dashboard) String() string {
 	return Stringify(d)
 }
