@@ -34,27 +34,32 @@ func TestDashboardsService_Get(t *testing.T) {
 
 }
 
-func TestDashboardsService_Create(t *testing.T) {
+func TestDashboardsService_Save_New(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	baseURL, _ := url.Parse(server.URL + "/")
 	client := NewClient(baseURL, "", nil)
 
+	slug := "slug"
 	mux.HandleFunc("/api/dashboards/db", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
-		fmt.Fprint(w, `{"id": 1}`)
+		fmt.Fprint(w, `{"slug": "`+slug+`", "version": 1, "status": "success"}`)
+	})
+	mux.HandleFunc("/api/dashboards/db/"+slug, func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprint(w, `{"dashboard": {"id": 1, "version": 2}}`)
 	})
 
-	dashboard := &Dashboard{}
+	d := &Dashboard{}
 	overwrite := false
-	d, err := client.Dashboards.Create(context.Background(), dashboard, overwrite)
+	err := client.Dashboards.Save(context.Background(), d, overwrite)
 	if err != nil {
-		t.Fatalf("Dashboards.Create returned error: %v", err)
+		t.Fatalf("Dashboards.Save returned error: %v", err)
 	}
 
-	want := &Dashboard{ID: DashboardID(1)}
+	want := &Dashboard{ID: DashboardID(1), Version: 2}
 	if !reflect.DeepEqual(d, want) {
-		t.Errorf("Dashboards.Create\nreturned: %+v\nwant: %+v", d, want)
+		t.Errorf("Dashboards.Save\nreturned: %+v\nwant: %+v", d, want)
 	}
 
 }

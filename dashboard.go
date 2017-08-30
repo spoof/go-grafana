@@ -8,32 +8,22 @@ import (
 type DashboardID uint64
 
 type Dashboard struct {
-	ID           DashboardID `json:"id,omitempty"`
-	Editable     bool        `json:"editable"`
-	GraphTooltip uint8       `json:"graphTooltip"`
-	HideControls bool        `json:"hideControls"`
-	Rows         []*Row      `json:"rows"`
-	Style        string      `json:"style"`
-	Timezone     string      `json:"timezone"`
-	Title        string      `json:"title"`
+	ID      DashboardID `json:"id"`
+	Version uint64      `json:"version"`
+
+	Editable     bool   `json:"editable"`
+	GraphTooltip uint8  `json:"graphTooltip"`
+	HideControls bool   `json:"hideControls"`
+	Rows         []*Row `json:"rows"`
+	Style        string `json:"style"`
+	Timezone     string `json:"timezone"`
+	Title        string `json:"title"`
 	tags         []string
 	Meta         *DashboardMeta `json:"meta,omitempty"`
 }
 
-type DashboardMeta struct {
-	Slug    string `json:"slug"`
-	Type    string `json:"type"`
-	Version int    `json:"version"`
-
-	CanEdit bool `json:"canEdit"`
-	CanSave bool `json:"canSave"`
-	CanStar bool `json:"canStar"`
-
-	Created   time.Time `json:"created"`
-	CreatedBy string    `json:"createdBy"`
-	Expires   time.Time `json:"expires"`
-	Updated   time.Time `json:"updated"`
-	UpdatedBy string    `json:"updatedBy"`
+func (d *Dashboard) String() string {
+	return Stringify(d)
 }
 
 // Tags is a getter for Dashboard tags field
@@ -86,6 +76,25 @@ func (d *Dashboard) RemoveTags(tags ...string) {
 	}
 }
 
+// UnmarshalJSON implements json.Unmarshaler interface
+func (d *Dashboard) UnmarshalJSON(data []byte) error {
+	type JSONDashboard Dashboard
+	inDashboard := struct {
+		*JSONDashboard
+		Tags []string `json:"tags"`
+	}{
+		JSONDashboard: (*JSONDashboard)(d),
+	}
+	if err := json.Unmarshal(data, &inDashboard); err != nil {
+		return err
+	}
+
+	d.tags = inDashboard.Tags
+
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler interface
 func (d *Dashboard) MarshalJSON() ([]byte, error) {
 	type JSONDashboard Dashboard
 	dd := (*JSONDashboard)(d)
@@ -98,6 +107,26 @@ func (d *Dashboard) MarshalJSON() ([]byte, error) {
 		JSONDashboard: dd,
 		Tags:          d.Tags(),
 	})
+}
+
+type DashboardMeta struct {
+	Slug    string `json:"slug"`
+	Type    string `json:"type"`
+	Version int    `json:"version"`
+
+	CanEdit bool `json:"canEdit"`
+	CanSave bool `json:"canSave"`
+	CanStar bool `json:"canStar"`
+
+	Created   time.Time `json:"created"`
+	CreatedBy string    `json:"createdBy"`
+	Expires   time.Time `json:"expires"`
+	Updated   time.Time `json:"updated"`
+	UpdatedBy string    `json:"updatedBy"`
+}
+
+func (dm *DashboardMeta) String() string {
+	return Stringify(dm)
 }
 
 type Row struct {

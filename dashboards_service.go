@@ -52,20 +52,24 @@ type dashboardGetResponse struct {
 	Meta      *DashboardMeta `json:"meta"`
 }
 
-// Create a new dashboard.
+// Save creates a new dashboard or updates existing one.
 //
 // Grafana API docs: http://docs.grafana.org/http_api/dashboard/#create-update-dashboard
-func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, overwrite bool) (*Dashboard, error) {
+func (ds *DashboardsService) Save(ctx context.Context, dashboard *Dashboard, overwrite bool) error {
 	u := "/api/dashboards/db"
 
 	dReq := dashboardCreateRequest{dashboard, overwrite}
 	req, err := ds.client.NewRequest(ctx, "POST", u, dReq)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	var dResp Dashboard
-	if _, err := ds.client.Do(req, &dResp); err != nil {
+	var respBody struct {
+		Slug    string `json:"slug"`
+		Status  string `json:"status"`
+		Version int    `json:"version"`
+	}
+	if _, err := ds.client.Do(req, &respBody); err != nil {
 		// TODO: handle errors properly
 		// 400 {"message":"Dashboard title cannot be empty", "error": ...}
 		// 404 {"status": "not-found", "message": err.Error()}
@@ -74,11 +78,20 @@ func (ds *DashboardsService) Create(ctx context.Context, dashboard *Dashboard, o
 		// 412 {"status": "plugin-dashboard", "message": message}
 		// 500 {"message": "failed to get quota", "error": ...}
 
-		return nil, err
+		return err
 	}
 
-	dashboard.ID = dResp.ID
-	return dashboard, nil
+	// To make our dashboard in sync with Grafana's one
+	// we need to refetch just saved dashboard by using `Get dashboard` API.
+	if respBody.Status == "success" {
+		d, err := ds.Get(ctx, respBody.Slug)
+		if err != nil {
+			return err
+		}
+		*dashboard = *d
+	}
+
+	return nil
 }
 
 type dashboardCreateRequest struct {
