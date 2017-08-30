@@ -137,11 +137,19 @@ func (dm *DashboardMeta) String() string {
 }
 
 type Row struct {
-	Collapse bool     `json:"collapse"`
-	Editable bool     `json:"editable"`
-	Height   string   `json:"height"`
-	Title    string   `json:"title"`
-	Panels   []*Panel `json:"panels"`
+	Collapsed bool     `json:"collapse"`
+	Editable  bool     `json:"editable"`
+	Height    string   `json:"height"`
+	Panels    []*Panel `json:"panels"`
+	ShowTitle bool     `json:"showTitle"`
+	Title     string   `json:"title"`
+	TitleSize string   `json:"titleSize"` // h1-h6
+}
+
+func NewRow() *Row {
+	return &Row{
+		Panels: []*Panel{},
+	}
 }
 
 type Panel struct {
