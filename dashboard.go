@@ -142,6 +142,7 @@ type Row struct {
 	Editable  bool     `json:"editable"`
 	Height    string   `json:"height"`
 	Panels    []*Panel `json:"panels"`
+	RepeatFor string   `json:"repeat"` // repeat row for given variable
 	ShowTitle bool     `json:"showTitle"`
 	Title     string   `json:"title"`
 	TitleSize string   `json:"titleSize"` // h1-h6
