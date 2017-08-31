@@ -25,7 +25,8 @@ type Dashboard struct {
 // NewDashboard creates new Dashboard.
 func NewDashboard(title string) *Dashboard {
 	return &Dashboard{
-		Title: title,
+		Title:    title,
+		Editable: true,
 	}
 }
 
@@ -148,7 +149,8 @@ type Row struct {
 
 func NewRow() *Row {
 	return &Row{
-		Panels: []*Panel{},
+		Editable: true,
+		Panels:   []*Panel{},
 	}
 }
 
