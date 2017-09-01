@@ -138,22 +138,74 @@ func (dm *DashboardMeta) String() string {
 }
 
 type Row struct {
-	Collapsed bool     `json:"collapse"`
-	Editable  bool     `json:"editable"`
-	Height    string   `json:"height"`
-	Panels    []*Panel `json:"panels"`
-	RepeatFor string   `json:"repeat"` // repeat row for given variable
-	ShowTitle bool     `json:"showTitle"`
-	Title     string   `json:"title"`
-	TitleSize string   `json:"titleSize"` // h1-h6
+	Collapsed bool         `json:"collapse"`
+	Editable  bool         `json:"editable"`
+	Height    string       `json:"height"`
+	Panels    []*TextPanel `json:"panels"`
+	RepeatFor string       `json:"repeat"` // repeat row for given variable
+	ShowTitle bool         `json:"showTitle"`
+	Title     string       `json:"title"`
+	TitleSize string       `json:"titleSize"` // TODO: validation: h1-h6
 }
 
+// NewRow creates new Row with somw defaults.
 func NewRow() *Row {
 	return &Row{
 		Editable: true,
-		Panels:   []*Panel{},
 	}
 }
 
-type Panel struct {
+type textPanelMode string
+
+const (
+	TextPanelHTMLMode     textPanelMode = "html"
+	TextPanelMarkdownMode textPanelMode = "markdown"
+	TextPanelTextMode     textPanelMode = "text"
+	textPanelDefaultMode  textPanelMode = TextPanelTextMode
+)
+
+type TextPanel struct {
+	Content string        `json:"content"`
+	Mode    textPanelMode `json:"mode"` // markdown/html/text, required
+
+	// General options
+	ID          int    `json:"id"` // Not sure if it's necessary
+	Description string `json:"description"`
+	Height      string `json:"height"`
+	// Links       []*PanelLink `json:"links"`
+	MinSpan     int    `json:"minSpan"`        // TODO: valid values: 1-12
+	Span        int    `json:"span,omitempty"` // TODO: valid values: 1-12
+	Title       string `json:"title"`
+	Transparent bool   `json:"transparent"`
+	Type        string `json:"type"` // required
+}
+
+// NewTextPanel creates new "Text" panel.
+func NewTextPanel() *TextPanel {
+	return &TextPanel{
+		Mode: textPanelDefaultMode,
+	}
+}
+
+type PanelLink struct {
+	IncludeVars  bool   `json:"includeVars"`
+	KeepTime     bool   `json:"keepTime"`
+	Params       string `json:"params"`
+	OpenInNewTab bool   `json:"targetBlank"`
+	Type         string `json:"type"` // TODO validation: absolute/dashboard
+
+	// type=absolute
+	Title string `json:"title,omitempty"`
+	URL   string `json:"url,omitempty"`
+
+	// type=dashboard
+	DashboardURI string `json:"dashUri,omitempty"`   // TODO: validation. should be valid dashboard
+	Dashboard    string `json:"dashboard,omitempty"` // actually it's title
+}
+
+// NewPanelLink creates new PanelLink
+func NewPanelLink(panelType string) *PanelLink {
+	return &PanelLink{
+		Type: panelType, // TODO: validation
+	}
 }
