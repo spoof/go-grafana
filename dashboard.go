@@ -159,6 +159,16 @@ type Row struct {
 	TitleSize string       `json:"titleSize"` // TODO: validation: h1-h6
 }
 
+// MarshalJSON implements encoding/json.Marshaler
+func (r *Row) MarshalJSON() ([]byte, error) {
+	for i, p := range r.Panels {
+		p.id = uint(i + 1)
+	}
+	type JSONRow Row
+	jr := (*JSONRow)(r)
+	return json.Marshal(jr)
+}
+
 // NewRow creates new Row with somw defaults.
 func NewRow() *Row {
 	return &Row{
@@ -179,15 +189,27 @@ type TextPanel struct {
 	Mode    TextPanelMode `json:"mode"`
 
 	// General options
-	ID          int    `json:"id"` // Not sure if it's necessary
-	Description string `json:"description"`
-	Height      string `json:"height"`
-	// Links       []*PanelLink `json:"links"`
-	MinSpan     int    `json:"minSpan"`        // TODO: valid values: 1-12
-	Span        int    `json:"span,omitempty"` // TODO: valid values: 1-12
-	Title       string `json:"title"`
-	Transparent bool   `json:"transparent"`
-	Type        string `json:"type"` // required
+	id          uint
+	Description string       `json:"description"`
+	Height      string       `json:"height"`
+	Links       []*PanelLink `json:"links"`
+	MinSpan     int          `json:"minSpan"`        // TODO: valid values: 1-12
+	Span        int          `json:"span,omitempty"` // TODO: valid values: 1-12
+	Title       string       `json:"title"`
+	Transparent bool         `json:"transparent"`
+	Type        string       `json:"type"` // required
+}
+
+func (p *TextPanel) MarshalJSON() ([]byte, error) {
+	type JSONPanel TextPanel
+	jp := (*JSONPanel)(p)
+	return json.Marshal(&struct {
+		*JSONPanel
+		ID uint `json:"id"`
+	}{
+		JSONPanel: jp,
+		ID:        jp.id,
+	})
 }
 
 // NewTextPanel creates new "Text" panel.
