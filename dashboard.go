@@ -120,7 +120,8 @@ func (d *Dashboard) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(&struct {
 		*JSONDashboard
-		Tags []string `json:"tags,omitempty"`
+		Tags []string       `json:"tags"`
+		Meta *DashboardMeta `json:"-"`
 	}{
 		JSONDashboard: dd,
 		Tags:          d.Tags(),
