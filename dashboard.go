@@ -7,26 +7,36 @@ import (
 
 type DashboardID uint64
 
+type dashboardStyle string
+
+const (
+	dashboardDarkStyle  dashboardStyle = "dark"
+	dashboardLightStyle dashboardStyle = "light"
+)
+
 type Dashboard struct {
 	ID      DashboardID `json:"id"`
 	Version uint64      `json:"version"`
 
-	Editable     bool   `json:"editable"`
-	GraphTooltip uint8  `json:"graphTooltip"`
-	HideControls bool   `json:"hideControls"`
-	Rows         []*Row `json:"rows"`
-	Style        string `json:"style"`
-	Timezone     string `json:"timezone"`
-	Title        string `json:"title"`
-	tags         []string
-	Meta         *DashboardMeta `json:"meta,omitempty"`
+	Editable      bool           `json:"editable"`
+	GraphTooltip  uint8          `json:"graphTooltip"`
+	HideControls  bool           `json:"hideControls"`
+	Rows          []*Row         `json:"rows"`
+	Style         dashboardStyle `json:"style"`
+	Timezone      string         `json:"timezone"`
+	Title         string         `json:"title"`
+	tags          []string
+	Meta          *DashboardMeta `json:"meta,omitempty"`
+	SchemaVersion int            `json:"schemaVersion"`
 }
 
 // NewDashboard creates new Dashboard.
 func NewDashboard(title string) *Dashboard {
 	return &Dashboard{
-		Title:    title,
-		Editable: true,
+		Title:         title,
+		Editable:      true,
+		SchemaVersion: 14,
+		Style:         dashboardDarkStyle,
 	}
 }
 
