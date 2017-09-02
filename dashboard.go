@@ -241,7 +241,7 @@ type PanelLink struct {
 
 	// type=dashboard
 	DashboardURI string `json:"dashUri,omitempty"`   // TODO: validation. should be valid dashboard
-	Dashboard    string `json:"dashboard,omitempty"` // actually it's title
+	Dashboard    string `json:"dashboard,omitempty"` // actually it's title. Autofilled from dashboard title
 }
 
 // NewPanelLink creates new PanelLink
