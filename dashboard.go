@@ -166,18 +166,17 @@ func NewRow() *Row {
 	}
 }
 
-type textPanelMode string
+type TextPanelMode string
 
 const (
-	TextPanelHTMLMode     textPanelMode = "html"
-	TextPanelMarkdownMode textPanelMode = "markdown"
-	TextPanelTextMode     textPanelMode = "text"
-	textPanelDefaultMode  textPanelMode = TextPanelTextMode
+	TextPanelHTMLMode     TextPanelMode = "html"
+	TextPanelMarkdownMode TextPanelMode = "markdown"
+	TextPanelTextMode     TextPanelMode = "text"
 )
 
 type TextPanel struct {
 	Content string        `json:"content"`
-	Mode    textPanelMode `json:"mode"` // markdown/html/text, required
+	Mode    TextPanelMode `json:"mode"`
 
 	// General options
 	ID          int    `json:"id"` // Not sure if it's necessary
@@ -192,9 +191,11 @@ type TextPanel struct {
 }
 
 // NewTextPanel creates new "Text" panel.
-func NewTextPanel() *TextPanel {
+func NewTextPanel(mode TextPanelMode) *TextPanel {
 	return &TextPanel{
-		Mode: textPanelDefaultMode,
+		Mode:    mode,
+		Type:    "text",
+		MinSpan: 12,
 	}
 }
 
