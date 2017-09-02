@@ -221,12 +221,19 @@ func NewTextPanel(mode TextPanelMode) *TextPanel {
 	}
 }
 
+type panelLinkType string
+
+const (
+	PanelLinkAbsolute  panelLinkType = "absolute"
+	PanelLinkDashboard panelLinkType = "dashboard"
+)
+
 type PanelLink struct {
-	IncludeVars  bool   `json:"includeVars"`
-	KeepTime     bool   `json:"keepTime"`
-	Params       string `json:"params"`
-	OpenInNewTab bool   `json:"targetBlank"`
-	Type         string `json:"type"` // TODO validation: absolute/dashboard
+	IncludeVars  bool          `json:"includeVars"`
+	KeepTime     bool          `json:"keepTime"`
+	Params       string        `json:"params"`
+	OpenInNewTab bool          `json:"targetBlank"`
+	Type         panelLinkType `json:"type"`
 
 	// type=absolute
 	Title string `json:"title,omitempty"`
@@ -238,8 +245,8 @@ type PanelLink struct {
 }
 
 // NewPanelLink creates new PanelLink
-func NewPanelLink(panelType string) *PanelLink {
+func NewPanelLink(linkType panelLinkType) *PanelLink {
 	return &PanelLink{
-		Type: panelType, // TODO: validation
+		Type: linkType,
 	}
 }
