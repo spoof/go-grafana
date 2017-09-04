@@ -106,7 +106,6 @@ func (d *Dashboard) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &inDashboard); err != nil {
 		return err
 	}
-
 	d.tags = inDashboard.Tags
 
 	return nil
@@ -148,48 +147,98 @@ func (dm *DashboardMeta) String() string {
 	return Stringify(dm)
 }
 
+// Row is panel's row
 type Row struct {
-	Collapsed bool         `json:"collapse"`
-	Editable  bool         `json:"editable"`
-	Height    string       `json:"height"`
-	Panels    []*TextPanel `json:"panels"`
-	RepeatFor string       `json:"repeat"` // repeat row for given variable
-	ShowTitle bool         `json:"showTitle"`
-	Title     string       `json:"title"`
-	TitleSize string       `json:"titleSize"` // TODO: validation: h1-h6
-}
-
-// MarshalJSON implements encoding/json.Marshaler
-func (r *Row) MarshalJSON() ([]byte, error) {
-	for i, p := range r.Panels {
-		p.id = uint(i + 1)
-	}
-	type JSONRow Row
-	jr := (*JSONRow)(r)
-	return json.Marshal(jr)
+	Collapsed bool    `json:"collapse"`
+	Editable  bool    `json:"editable"`
+	Height    string  `json:"height"`
+	Panels    []Panel `json:"panels"`
+	RepeatFor string  `json:"repeat"` // repeat row for given variable
+	ShowTitle bool    `json:"showTitle"`
+	Title     string  `json:"title"`
+	TitleSize string  `json:"titleSize"` // TODO: validation: h1-h6
 }
 
 // NewRow creates new Row with somw defaults.
 func NewRow() *Row {
-	return &Row{
-		Editable: true,
-	}
+	return &Row{Editable: true}
 }
 
-type TextPanelMode string
+// MarshalJSON implements encoding/json.Marshaler
+func (r *Row) MarshalJSON() ([]byte, error) {
+	type JSONRow Row
+	jr := (*JSONRow)(r)
+
+	for i, p := range jr.Panels {
+		p.GeneralOptions().id = uint(i + 1)
+	}
+
+	return json.Marshal(jr)
+}
+
+func (r *Row) UnmarshalJSON(data []byte) error {
+	type JSONRow Row
+	jr := struct {
+		*JSONRow
+		Panels []dummyPanel `json:"panels"`
+	}{
+		JSONRow: (*JSONRow)(r),
+	}
+
+	if err := json.Unmarshal(data, &jr); err != nil {
+		return err
+	}
+
+	panels := make([]Panel, len(jr.Panels))
+	for i, p := range jr.Panels {
+		panels[i] = p.Panel
+	}
+	r.Panels = panels
+	return nil
+}
+
+type Panel interface {
+	GeneralOptions() *PanelGeneralOptions
+}
+
+type panelType string
 
 const (
-	TextPanelHTMLMode     TextPanelMode = "html"
-	TextPanelMarkdownMode TextPanelMode = "markdown"
-	TextPanelTextMode     TextPanelMode = "text"
+	textPanel panelType = "text"
 )
 
-type TextPanel struct {
-	Content string        `json:"content"`
-	Mode    TextPanelMode `json:"mode"`
+type dummyPanel struct {
+	Type panelType `json:"type"`
+	Panel
+}
 
-	// General options
-	id          uint
+func (p *dummyPanel) UnmarshalJSON(data []byte) error {
+	type JSONPanel dummyPanel
+	var jp JSONPanel
+	if err := json.Unmarshal(data, &jp); err != nil {
+		return err
+	}
+
+	var panel Panel
+	switch jp.Type {
+	case textPanel:
+		panel = new(TextPanel)
+	default:
+		return nil
+	}
+
+	if err := json.Unmarshal(data, panel); err != nil {
+		return err
+	}
+
+	p.Panel = panel
+	return nil
+}
+
+type PanelGeneralOptions struct {
+	id        uint
+	panelType panelType
+
 	Description string       `json:"description"`
 	Height      string       `json:"height"`
 	Links       []*PanelLink `json:"links"`
@@ -197,28 +246,80 @@ type TextPanel struct {
 	Span        int          `json:"span,omitempty"` // TODO: valid values: 1-12
 	Title       string       `json:"title"`
 	Transparent bool         `json:"transparent"`
-	Type        string       `json:"type"` // required
 }
 
-func (p *TextPanel) MarshalJSON() ([]byte, error) {
-	type JSONPanel TextPanel
-	jp := (*JSONPanel)(p)
-	return json.Marshal(&struct {
-		*JSONPanel
-		ID uint `json:"id"`
-	}{
-		JSONPanel: jp,
-		ID:        jp.id,
-	})
+// TextPanelMode is a type of Text panel.
+type TextPanelMode string
+
+// This is all possible types (modes) of Text panel.
+const (
+	TextPanelHTMLMode     TextPanelMode = "html"
+	TextPanelMarkdownMode TextPanelMode = "markdown"
+	TextPanelTextMode     TextPanelMode = "text"
+)
+
+// TextPanel represents Text Panel
+type TextPanel struct {
+	Content string        `json:"content"`
+	Mode    TextPanelMode `json:"mode"`
+
+	generalOptions PanelGeneralOptions
 }
 
 // NewTextPanel creates new "Text" panel.
 func NewTextPanel(mode TextPanelMode) *TextPanel {
 	return &TextPanel{
-		Mode:    mode,
-		Type:    "text",
-		MinSpan: 12,
+		Mode: mode,
+		generalOptions: PanelGeneralOptions{
+			panelType: textPanel,
+			MinSpan:   12,
+		},
 	}
+}
+
+func (p *TextPanel) GeneralOptions() *PanelGeneralOptions {
+	return &p.generalOptions
+}
+
+func (p *TextPanel) MarshalJSON() ([]byte, error) {
+	type JSONPanel TextPanel
+	jp := struct {
+		*JSONPanel
+		*PanelGeneralOptions
+		ID   uint      `json:"id"`
+		Type panelType `json:"type"`
+	}{
+		JSONPanel:           (*JSONPanel)(p),
+		PanelGeneralOptions: p.GeneralOptions(),
+		ID:                  p.GeneralOptions().id,
+		Type:                p.GeneralOptions().panelType,
+	}
+	return json.Marshal(jp)
+}
+
+func (p *TextPanel) UnmarshalJSON(data []byte) error {
+	type JSONPanel TextPanel
+	jp := struct {
+		*JSONPanel
+		*PanelGeneralOptions
+		ID   uint      `json:"id"`
+		Type panelType `json:"type"`
+	}{
+		JSONPanel:           (*JSONPanel)(p),
+		PanelGeneralOptions: p.GeneralOptions(),
+		ID:                  p.GeneralOptions().id,
+		Type:                p.GeneralOptions().panelType,
+	}
+
+	if err := json.Unmarshal(data, &jp); err != nil {
+		return err
+	}
+
+	jp.PanelGeneralOptions.id = jp.ID
+	jp.PanelGeneralOptions.panelType = jp.panelType
+	p.generalOptions = *jp.PanelGeneralOptions
+
+	return nil
 }
 
 type panelLinkType string
