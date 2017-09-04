@@ -242,8 +242,8 @@ type PanelGeneralOptions struct {
 	Description string       `json:"description"`
 	Height      string       `json:"height"`
 	Links       []*PanelLink `json:"links"`
-	MinSpan     int          `json:"minSpan"`        // TODO: valid values: 1-12
-	Span        int          `json:"span,omitempty"` // TODO: valid values: 1-12
+	MinSpan     int          `json:"minSpan"` // TODO: valid values: 1-12
+	Span        int          `json:"span"`    // TODO: valid values: 1-12
 	Title       string       `json:"title"`
 	Transparent bool         `json:"transparent"`
 }
