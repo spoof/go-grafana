@@ -45,8 +45,11 @@ func TestDashboardsService_Get(t *testing.T) {
 
 	want := grafana.NewDashboard(title)
 	want.ID = grafana.DashboardID(1)
-	if !reflect.DeepEqual(d, want) {
-		t.Errorf("Dashboards.Get\nreturned: %+v\nwant: %+v", d, want)
+	if !reflect.DeepEqual(d.ID, want.ID) {
+		t.Errorf("Dashboards.Get\nreturned ID: %+v\nwant: %+v", d.ID, want.ID)
+	}
+	if !reflect.DeepEqual(d.Title, want.Title) {
+		t.Errorf("Dashboards.Get\nreturned Title: %+v\nwant: %+v", d.Title, want.Title)
 	}
 
 }
@@ -78,8 +81,12 @@ func TestDashboardsService_Save_New(t *testing.T) {
 	want := grafana.NewDashboard(title)
 	want.ID = grafana.DashboardID(1)
 	want.Version = 2
-	if !reflect.DeepEqual(d, want) {
-		t.Errorf("Dashboards.Save\nreturned: %+v\nwant: %+v", d, want)
+	if !reflect.DeepEqual(d.ID, want.ID) {
+		t.Errorf("Dashboards.Save\nreturned: %+v\nwant: %+v", d.ID, want.ID)
+	}
+
+	if !reflect.DeepEqual(d.Version, want.Version) {
+		t.Errorf("Dashboards.Save\nreturned Version: %+v\nwant: %+v", d.Version, want.Version)
 	}
 
 }
