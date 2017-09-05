@@ -1,7 +1,0 @@
-{
-    "dependencies": {
-        "github.com/google/go-querystring": {
-            "branch": "master"
-        }
-    }
-}
