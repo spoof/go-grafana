@@ -242,8 +242,8 @@ type PanelGeneralOptions struct {
 	Description string       `json:"description"`
 	Height      string       `json:"height"`
 	Links       []*PanelLink `json:"links"`
-	MinSpan     int          `json:"minSpan"` // TODO: valid values: 1-12
-	Span        int          `json:"span"`    // TODO: valid values: 1-12
+	MinSpan     uint         `json:"minSpan"` // TODO: valid values: 1-12
+	Span        uint         `json:"span"`    // TODO: valid values: 1-12
 	Title       string       `json:"title"`
 	Transparent bool         `json:"transparent"`
 }
@@ -302,22 +302,16 @@ func (p *TextPanel) UnmarshalJSON(data []byte) error {
 	jp := struct {
 		*JSONPanel
 		*PanelGeneralOptions
-		ID   uint      `json:"id"`
-		Type panelType `json:"type"`
+		Type *panelType `json:"type"`
 	}{
 		JSONPanel:           (*JSONPanel)(p),
 		PanelGeneralOptions: p.GeneralOptions(),
-		ID:                  p.GeneralOptions().id,
-		Type:                p.GeneralOptions().panelType,
+		Type:                &p.GeneralOptions().panelType,
 	}
 
 	if err := json.Unmarshal(data, &jp); err != nil {
 		return err
 	}
-
-	jp.PanelGeneralOptions.id = jp.ID
-	jp.PanelGeneralOptions.panelType = jp.panelType
-	p.generalOptions = *jp.PanelGeneralOptions
 
 	return nil
 }
