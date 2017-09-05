@@ -1,10 +1,12 @@
-package grafana
+package client
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/spoof/go-grafana/grafana"
 )
 
 // DashboardsService communicates with dashboard methods of the Grafana API.
@@ -25,7 +27,7 @@ var ErrDashboardNotFound = errors.New("Dashboard not found")
 // Get fetches a dashboard by given slug.
 //
 // Grafana API docs: http://docs.grafana.org/http_api/dashboard/#get-dashboard
-func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, error) {
+func (ds *DashboardsService) Get(ctx context.Context, slug string) (*grafana.Dashboard, error) {
 	u := fmt.Sprintf("/api/dashboards/db/%s", slug)
 	req, err := ds.client.NewRequest(ctx, "GET", u, nil)
 	if err != nil {
@@ -48,14 +50,14 @@ func (ds *DashboardsService) Get(ctx context.Context, slug string) (*Dashboard, 
 }
 
 type dashboardGetResponse struct {
-	Dashboard Dashboard      `json:"dashboard"`
-	Meta      *DashboardMeta `json:"meta"`
+	Dashboard grafana.Dashboard      `json:"dashboard"`
+	Meta      *grafana.DashboardMeta `json:"meta"`
 }
 
 // Save creates a new dashboard or updates existing one.
 //
 // Grafana API docs: http://docs.grafana.org/http_api/dashboard/#create-update-dashboard
-func (ds *DashboardsService) Save(ctx context.Context, dashboard *Dashboard, overwrite bool) error {
+func (ds *DashboardsService) Save(ctx context.Context, dashboard *grafana.Dashboard, overwrite bool) error {
 	u := "/api/dashboards/db"
 
 	dReq := dashboardCreateRequest{dashboard, overwrite}
@@ -95,8 +97,8 @@ func (ds *DashboardsService) Save(ctx context.Context, dashboard *Dashboard, ove
 }
 
 type dashboardCreateRequest struct {
-	Dashboard *Dashboard `json:"dashboard"`
-	Overwrite bool       `json:"overwrite"`
+	Dashboard *grafana.Dashboard `json:"dashboard"`
+	Overwrite bool               `json:"overwrite"`
 }
 
 // DashboardSearchOptions specifies the optional parameters to the
@@ -143,5 +145,5 @@ type DashboardHit struct {
 }
 
 func (dh *DashboardHit) String() string {
-	return Stringify(dh)
+	return grafana.Stringify(dh)
 }

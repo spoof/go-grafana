@@ -1,4 +1,4 @@
-package grafana
+package client
 
 import (
 	"context"
@@ -8,6 +8,8 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+
+	"github.com/spoof/go-grafana/grafana"
 )
 
 func TestDashboardsService_Get(t *testing.T) {
@@ -28,8 +30,8 @@ func TestDashboardsService_Get(t *testing.T) {
 		t.Fatalf("Dashboards.Get returned error: %v", err)
 	}
 
-	want := NewDashboard(title)
-	want.ID = DashboardID(1)
+	want := grafana.NewDashboard(title)
+	want.ID = grafana.DashboardID(1)
 	if !reflect.DeepEqual(d, want) {
 		t.Errorf("Dashboards.Get\nreturned: %+v\nwant: %+v", d, want)
 	}
@@ -53,15 +55,15 @@ func TestDashboardsService_Save_New(t *testing.T) {
 		fmt.Fprint(w, `{"dashboard": {"id": 1, "title": "`+title+`", "version": 2}}`)
 	})
 
-	d := NewDashboard(title)
+	d := grafana.NewDashboard(title)
 	overwrite := false
 	err := client.Dashboards.Save(context.Background(), d, overwrite)
 	if err != nil {
 		t.Fatalf("Dashboards.Save returned error: %v", err)
 	}
 
-	want := NewDashboard(title)
-	want.ID = DashboardID(1)
+	want := grafana.NewDashboard(title)
+	want.ID = grafana.DashboardID(1)
 	want.Version = 2
 	if !reflect.DeepEqual(d, want) {
 		t.Errorf("Dashboards.Save\nreturned: %+v\nwant: %+v", d, want)
