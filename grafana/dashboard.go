@@ -193,7 +193,7 @@ func (r *Row) UnmarshalJSON(data []byte) error {
 	type JSONRow Row
 	jr := struct {
 		*JSONRow
-		Panels []dummyPanel `json:"panels"`
+		Panels []probePanel `json:"panels"`
 	}{
 		JSONRow: (*JSONRow)(r),
 	}

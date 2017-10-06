@@ -26,13 +26,13 @@ const (
 	singlestatPanel panelType = "singlestat"
 )
 
-type dummyPanel struct {
+type probePanel struct {
 	Type panelType `json:"type"`
 	Panel
 }
 
-func (p *dummyPanel) UnmarshalJSON(data []byte) error {
-	type JSONPanel dummyPanel
+func (p *probePanel) UnmarshalJSON(data []byte) error {
+	type JSONPanel probePanel
 	var jp JSONPanel
 	if err := json.Unmarshal(data, &jp); err != nil {
 		return err
