@@ -43,7 +43,7 @@ type Datasource struct {
 	OrgID OrgID `json:"orgId"`
 
 	Name              string         `json:"name"`
-	Type              string         `json:"type"`
+	Type              datasourceType `json:"type"`
 	Access            httpAccessType `json:"access"`
 	URL               string         `json:"url"`
 	Password          string         `json:"password"`
