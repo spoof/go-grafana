@@ -38,7 +38,8 @@ type Client struct {
 	BaseURL   *url.URL // Base URL for API requests.
 	UserAgent string   // User agent used when communicating with the GitHub API.
 
-	Dashboards *DashboardsService
+	Dashboards  *DashboardsService
+	Datasources *DatasourcesService
 }
 
 // NewClient returns a new Grafana API client. If a nil httpClient is
@@ -52,6 +53,7 @@ func NewClient(baseURL *url.URL, token string, httpClient *http.Client) *Client 
 
 	c := &Client{client: httpClient, BaseURL: baseURL, token: token}
 	c.Dashboards = NewDashboardsService(c)
+	c.Datasources = NewDatasourcesService(c)
 
 	return c
 }
