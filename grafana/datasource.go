@@ -24,7 +24,7 @@ const (
 )
 
 type Datasource struct {
-	Id    DatasourceID `json:"id"`
+	ID    DatasourceID `json:"id"`
 	OrgID OrgID        `json:"orgId"`
 
 	Name              string         `json:"name"`

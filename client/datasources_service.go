@@ -15,6 +15,9 @@ package client
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"net/http"
 
 	"github.com/spoof/go-grafana/grafana"
 )
@@ -47,4 +50,31 @@ func (s *DatasourcesService) GetAll(ctx context.Context) ([]*grafana.Datasource,
 	}
 
 	return datasources, nil
+}
+
+// ErrDatasourceNotFound represents an error if datasource not found.
+var ErrDatasourceNotFound = errors.New("Datasource not found")
+
+// GetByID fetches datasource by given id.
+//
+// Grafana API docs: http://docs.grafana.org/http_api/data_source/#get-a-single-data-sources-by-id
+func (s *DatasourcesService) GetByID(ctx context.Context, id grafana.DatasourceID) (*grafana.Datasource, error) {
+	u := fmt.Sprintf("/api/datasources/%d", id)
+	req, err := s.client.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var d grafana.Datasource
+	if resp, err := s.client.Do(req, &d); err != nil {
+		if resp != nil {
+			if resp.StatusCode == http.StatusNotFound {
+				return nil, ErrDatasourceNotFound
+			}
+		}
+
+		return nil, err
+	}
+
+	return &d, nil
 }
