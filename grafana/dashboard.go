@@ -18,9 +18,10 @@ import (
 	"time"
 )
 
-type DashboardID uint64
-
-type dashboardStyle string
+type (
+	DashboardID    uint64
+	dashboardStyle string
+)
 
 const (
 	dashboardDarkStyle  dashboardStyle = "dark"
