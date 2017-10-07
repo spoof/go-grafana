@@ -13,19 +13,34 @@
 
 package grafana
 
+import "encoding/json"
+
 type (
-	DatasourceID   uint
+	// DatasourceID represents id type of datasource
+	DatasourceID uint
+	// httpAccessType represents type of http access options
 	httpAccessType string
 )
 
+// Types of HTTP access to datasource
 const (
-	HTTPAccesProxy  = "proxy"
-	HTTPAccesDirect = "direct"
+	HTTPAccesProxy  httpAccessType = "proxy"
+	HTTPAccesDirect httpAccessType = "direct"
 )
 
+// datasourceType is type of datasource
+type datasourceType string
+
+// Types of datasource
+const (
+	GraphiteDatasource   datasourceType = "graphite"
+	PrometheusDatasource datasourceType = "prometheus"
+)
+
+// Datasource represents datasource entity of Grafana.
 type Datasource struct {
-	ID    DatasourceID `json:"id"`
-	OrgID OrgID        `json:"orgId"`
+	id    DatasourceID
+	OrgID OrgID `json:"orgId"`
 
 	Name              string         `json:"name"`
 	Type              string         `json:"type"`
@@ -46,6 +61,39 @@ type Datasource struct {
 
 }
 
+// ID returns id of Datasource
+func (d *Datasource) ID() DatasourceID {
+	return d.id
+}
+
+// String implements fmt.Stringer interface
 func (d *Datasource) String() string {
 	return Stringify(d)
+}
+
+// MarshalJSON implements json.Marshaler interface
+func (d *Datasource) MarshalJSON() ([]byte, error) {
+	type JSONDatasource Datasource
+	jd := struct {
+		*JSONDatasource
+		ID DatasourceID `json:"id"`
+	}{
+		JSONDatasource: (*JSONDatasource)(d),
+		ID:             d.id,
+	}
+	return json.Marshal(jd)
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface
+func (d *Datasource) UnmarshalJSON(data []byte) error {
+	type JSONDatasource Datasource
+	jd := struct {
+		*JSONDatasource
+		ID *DatasourceID `json:"id"`
+	}{
+		JSONDatasource: (*JSONDatasource)(d),
+		ID:             &d.id,
+	}
+
+	return json.Unmarshal(data, &jd)
 }
