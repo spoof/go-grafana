@@ -78,3 +78,31 @@ func (s *DatasourcesService) GetByID(ctx context.Context, id grafana.DatasourceI
 
 	return &d, nil
 }
+
+// GetByName fetches datasource with given name.
+//
+// Grafana API docs: http://docs.grafana.org/http_api/data_source/#get-a-single-data-source-by-name
+func (s *DatasourcesService) GetByName(ctx context.Context, name string) (*grafana.Datasource, error) {
+	if name == "" {
+		return nil, errors.New("Name cannot be empty")
+	}
+
+	u := fmt.Sprintf("/api/datasources/name/%s", name)
+	req, err := s.client.NewRequest(ctx, "GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var d grafana.Datasource
+	if resp, err := s.client.Do(req, &d); err != nil {
+		if resp != nil {
+			if resp.StatusCode == http.StatusNotFound {
+				return nil, ErrDatasourceNotFound
+			}
+		}
+
+		return nil, err
+	}
+
+	return &d, nil
+}
