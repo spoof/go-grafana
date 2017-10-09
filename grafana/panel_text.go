@@ -48,6 +48,10 @@ func (p *TextPanel) GeneralOptions() *PanelGeneralOptions {
 	return &p.generalOptions
 }
 
+func (p *TextPanel) QueriesOptions() *QueriesOptions {
+	return nil
+}
+
 func (p *TextPanel) MarshalJSON() ([]byte, error) {
 	type JSONPanel TextPanel
 	jp := struct {
@@ -76,9 +80,5 @@ func (p *TextPanel) UnmarshalJSON(data []byte) error {
 		Type:                &p.GeneralOptions().panelType,
 	}
 
-	if err := json.Unmarshal(data, &jp); err != nil {
-		return err
-	}
-
-	return nil
+	return json.Unmarshal(data, &jp)
 }

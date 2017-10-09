@@ -54,6 +54,7 @@ type SinglestatPanel struct {
 	} `json:"gauge"`
 
 	generalOptions PanelGeneralOptions
+	queriesOptions QueriesOptions
 }
 
 // NewSinglestatPanel creates new "Singlestat" panel.
@@ -71,16 +72,22 @@ func (p *SinglestatPanel) GeneralOptions() *PanelGeneralOptions {
 	return &p.generalOptions
 }
 
+func (p *SinglestatPanel) QueriesOptions() *QueriesOptions {
+	return &p.queriesOptions
+}
+
 func (p *SinglestatPanel) MarshalJSON() ([]byte, error) {
 	type JSONPanel SinglestatPanel
 	jp := struct {
 		*JSONPanel
 		*PanelGeneralOptions
+		*QueriesOptions
 		ID   uint      `json:"id"`
 		Type panelType `json:"type"`
 	}{
 		JSONPanel:           (*JSONPanel)(p),
 		PanelGeneralOptions: p.GeneralOptions(),
+		QueriesOptions:      p.QueriesOptions(),
 		ID:                  p.GeneralOptions().id,
 		Type:                p.GeneralOptions().panelType,
 	}
@@ -92,16 +99,14 @@ func (p *SinglestatPanel) UnmarshalJSON(data []byte) error {
 	jp := struct {
 		*JSONPanel
 		*PanelGeneralOptions
+		*QueriesOptions
 		Type *panelType `json:"type"`
 	}{
 		JSONPanel:           (*JSONPanel)(p),
 		PanelGeneralOptions: p.GeneralOptions(),
+		QueriesOptions:      p.QueriesOptions(),
 		Type:                &p.GeneralOptions().panelType,
 	}
 
-	if err := json.Unmarshal(data, &jp); err != nil {
-		return err
-	}
-
-	return nil
+	return json.Unmarshal(data, &jp)
 }

@@ -19,6 +19,7 @@ import (
 
 type Panel interface {
 	GeneralOptions() *PanelGeneralOptions
+	QueriesOptions() *QueriesOptions
 }
 
 type panelType string
@@ -102,4 +103,35 @@ func NewPanelLink(linkType panelLinkType) *PanelLink {
 	return &PanelLink{
 		Type: linkType,
 	}
+}
+
+// QueriesOptions is a part of panel that placed in 'Metrics' tab. It represents set of panel queries.
+type QueriesOptions struct {
+	Datasource string   `json:"datasource,omitempty"`
+	Queries    []*Query `json:"targets,omitempty"`
+}
+
+// Query is a single query options that common to all datasources.
+type Query struct {
+	Datasource *string `json:"datasource"`
+	RefID      string  `json:"refid"`
+}
+
+// PrometheusQuery is query specific options for Prometheus datasource.
+type PrometheusQuery struct {
+	Query
+
+	IntervalFactor uint   `json:"intervalFactor"`
+	Interval       uint   `json:"interval"`
+	Format         string `json:"format"`
+	Expression     string `json:"expr"`
+	LegendFormat   string `json:"legendFormat"`
+	Step           uint   `json:"step"`
+}
+
+// GraphiteQuery is query specific options for Graphite datasource.
+type GraphiteQuery struct {
+	Query
+
+	Target string `json:"target"`
 }
