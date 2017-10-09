@@ -26,6 +26,7 @@ type panelType string
 const (
 	textPanel       panelType = "text"
 	singlestatPanel panelType = "singlestat"
+	graphPanel      panelType = "graph"
 )
 
 type probePanel struct {
@@ -46,6 +47,8 @@ func (p *probePanel) UnmarshalJSON(data []byte) error {
 		panel = new(TextPanel)
 	case singlestatPanel:
 		panel = new(SinglestatPanel)
+	case graphPanel:
+		panel = new(GraphPanel)
 	default:
 		return nil
 	}
