@@ -15,6 +15,7 @@ package grafana
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -163,14 +164,14 @@ func (dm *DashboardMeta) String() string {
 
 // Row is panel's row
 type Row struct {
-	Collapsed bool    `json:"collapse"`
-	Editable  bool    `json:"editable"`
-	Height    string  `json:"height"`
-	Panels    []Panel `json:"panels"`
-	RepeatFor string  `json:"repeat"` // repeat row for given variable
-	ShowTitle bool    `json:"showTitle"`
-	Title     string  `json:"title"`
-	TitleSize string  `json:"titleSize"` // TODO: validation: h1-h6
+	Collapsed bool        `json:"collapse"`
+	Editable  bool        `json:"editable"`
+	Height    forceString `json:"height"`
+	Panels    []Panel     `json:"panels"`
+	RepeatFor string      `json:"repeat"` // repeat row for given variable
+	ShowTitle bool        `json:"showTitle"`
+	Title     string      `json:"title"`
+	TitleSize string      `json:"titleSize"` // TODO: validation: h1-h6
 }
 
 // NewRow creates new Row with somw defaults.
@@ -208,5 +209,27 @@ func (r *Row) UnmarshalJSON(data []byte) error {
 		panels[i] = p.Panel
 	}
 	r.Panels = panels
+	return nil
+}
+
+// forceString is type that forces conversion to string
+type forceString string
+
+// UnmarshalJSON implements json.Unmarshaler interface
+func (s *forceString) UnmarshalJSON(data []byte) error {
+	var val interface{}
+	if err := json.Unmarshal(data, &val); err != nil {
+		return err
+	}
+
+	switch v := val.(type) {
+	case float64:
+		*s = forceString(fmt.Sprintf("%d", int(v)))
+	case string:
+		*s = forceString(v)
+	default:
+		*s = ""
+	}
+
 	return nil
 }

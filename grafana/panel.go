@@ -15,7 +15,6 @@ package grafana
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Panel interface {
@@ -64,35 +63,12 @@ type PanelGeneralOptions struct {
 	panelType panelType
 
 	Description string       `json:"description"`
-	Height      panelHeight  `json:"height"`
+	Height      forceString  `json:"height"`
 	Links       []*PanelLink `json:"links"`
 	MinSpan     uint         `json:"minSpan"` // TODO: valid values: 1-12
 	Span        uint         `json:"span"`    // TODO: valid values: 1-12
 	Title       string       `json:"title"`
 	Transparent bool         `json:"transparent"`
-}
-
-// panelHeight is type for Height option of Panel. It exists only because of need of custom unmarshaling.
-// This field sometimes has integer value in JSON data.
-type panelHeight string
-
-// UnmarshalJSON implements json.Unmarshaler interface
-func (ph *panelHeight) UnmarshalJSON(data []byte) error {
-	var height interface{}
-	if err := json.Unmarshal(data, &height); err != nil {
-		return err
-	}
-
-	switch v := height.(type) {
-	case float64:
-		*ph = panelHeight(fmt.Sprintf("%d", int(v)))
-	case string:
-		*ph = panelHeight(v)
-	default:
-		*ph = ""
-	}
-
-	return nil
 }
 
 type panelLinkType string

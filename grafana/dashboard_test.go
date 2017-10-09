@@ -96,3 +96,29 @@ func JSONBytesEqual(a, b []byte) (bool, error) {
 	}
 	return reflect.DeepEqual(j2, j), nil
 }
+
+func TestForceString_UnmarshalJSON(t *testing.T) {
+	tt := []struct {
+		got      string
+		expected forceString
+	}{
+		{got: `{"height": ""}`, expected: ""},
+		{got: `{"height": null}`, expected: ""},
+		{got: `{"height": 200}`, expected: "200"},
+		{got: `{"height": "200px"}`, expected: "200px"},
+	}
+
+	for _, ts := range tt {
+		data := struct {
+			Height forceString `json:"height"`
+		}{}
+
+		if err := json.Unmarshal([]byte(ts.got), &data); err != nil {
+			t.Fatalf("forceString.UnmarshalJSON returned error %s", err)
+		}
+
+		if !reflect.DeepEqual(ts.expected, data.Height) {
+			t.Errorf("forceString.MarshalJSON:\nexpected: %#v\ngot: %#v", ts.expected, data.Height)
+		}
+	}
+}
