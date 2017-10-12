@@ -107,31 +107,119 @@ func NewPanelLink(linkType panelLinkType) *PanelLink {
 
 // QueriesOptions is a part of panel that placed in 'Metrics' tab. It represents set of panel queries.
 type QueriesOptions struct {
-	Datasource string   `json:"datasource,omitempty"`
-	Queries    []*Query `json:"targets,omitempty"`
+	Datasource string `json:"datasource,omitempty"`
+	Queries    []Query
 }
 
-// Query is a single query options that common to all datasources.
-type Query struct {
+func (o *QueriesOptions) UnmarshalJSON(data []byte) error {
+	type JSONOptions QueriesOptions
+
+	var queries []*probeQuery
+	jo := struct {
+		*JSONOptions
+		Queries *[]*probeQuery `json:"targets,omitempty"`
+	}{
+		JSONOptions: (*JSONOptions)(o),
+		Queries:     &queries,
+	}
+	if err := json.Unmarshal(data, &jo); err != nil {
+		return err
+	}
+
+	o.Queries = []Query{}
+	for _, q := range queries {
+		// TODO: queies shouldn't be nil in future. This check will be obsolete
+		if q.query == nil {
+			continue
+		}
+		o.Queries = append(o.Queries, q.query)
+	}
+
+	return nil
+}
+
+type probeQuery struct {
+	// PrometheusQuery
+	IntervalFactor *uint   `json:"intervalFactor"`
+	Expression     *string `json:"expr"`
+
+	// GraphiteQuery fields
+	Target *string `json:"target"`
+
+	query Query
+}
+
+func (q *probeQuery) UnmarshalJSON(data []byte) error {
+	type JSONQuery probeQuery
+	var jq JSONQuery
+	if err := json.Unmarshal(data, &jq); err != nil {
+		return err
+	}
+
+	var query Query
+	if jq.Expression != nil && jq.IntervalFactor != nil {
+		query = new(PrometheusQuery)
+	} else if jq.Target != nil {
+		query = new(GraphiteQuery)
+	}
+
+	// TODO: Initialize Unknown query here instead
+	if query == nil {
+		return nil
+	}
+
+	if err := json.Unmarshal(data, &query); err != nil {
+		return err
+	}
+
+	q.query = query
+	return nil
+}
+
+// commonQuery is a single query options that common to all datasources.
+type commonQuery struct {
 	Datasource *string `json:"datasource"`
 	RefID      string  `json:"refid"`
 }
 
 // PrometheusQuery is query specific options for Prometheus datasource.
 type PrometheusQuery struct {
-	Query
+	commonQuery
 
-	IntervalFactor uint   `json:"intervalFactor"`
-	Interval       uint   `json:"interval"`
-	Format         string `json:"format"`
-	Expression     string `json:"expr"`
-	LegendFormat   string `json:"legendFormat"`
-	Step           uint   `json:"step"`
+	IntervalFactor uint `json:"intervalFactor"`
+	// Interval       uint   `json:"interval"`
+	// FIXME: Interval can be a string. We need to convert it to int
+	Interval     string `json:"interval"`
+	Format       string `json:"format"`
+	Expression   string `json:"expr"`
+	LegendFormat string `json:"legendFormat"`
+	Step         uint   `json:"step"`
+}
+
+func (q *PrometheusQuery) RefID() string {
+	return q.commonQuery.RefID
+}
+
+func (q *PrometheusQuery) Datasource() string {
+	return *q.commonQuery.Datasource
 }
 
 // GraphiteQuery is query specific options for Graphite datasource.
 type GraphiteQuery struct {
-	Query
+	commonQuery
 
 	Target string `json:"target"`
+}
+
+func (q *GraphiteQuery) RefID() string {
+	return q.commonQuery.RefID
+}
+
+func (q *GraphiteQuery) Datasource() string {
+	return *q.commonQuery.Datasource
+}
+
+type Query interface {
+	RefID() string
+	Datasource() string
 }
