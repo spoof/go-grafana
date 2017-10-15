@@ -107,8 +107,8 @@ func NewPanelLink(linkType panelLinkType) *PanelLink {
 
 // QueriesOptions is a part of panel that placed in 'Metrics' tab. It represents set of panel queries.
 type QueriesOptions struct {
-	Datasource string `json:"datasource,omitempty"`
-	Queries    []Query
+	Datasource string  `json:"datasource,omitempty"`
+	Queries    []Query `json:"targets"`
 }
 
 func (o *QueriesOptions) UnmarshalJSON(data []byte) error {
@@ -136,6 +136,43 @@ func (o *QueriesOptions) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+// MarshalJSON implements encoding/json.Marshaler
+func (o *QueriesOptions) MarshalJSON() ([]byte, error) {
+	type JSONOptions QueriesOptions
+	jo := (*JSONOptions)(o)
+
+	// FIXME: add checking for uniqueness of refids
+	for i, q := range jo.Queries {
+		if q.commonOptions().RefID != "" {
+			continue
+		}
+		q.commonOptions().RefID = makeRefID(i)
+	}
+
+	// TODO: if there are a several types of datasources we need to set 'main' datasouce to "Mixed"
+
+	return json.Marshal(jo)
+}
+
+// makeRefID returns symbolic ID for given index.
+// TODO: It has very rough implementation. Needs refactoring.
+func makeRefID(index int) string {
+	letters := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	var id string
+	if index >= len(letters) {
+		id += makeRefID(index % len(letters))
+	} else {
+		id = string(letters[index])
+	}
+
+	var result string
+	for _, v := range id {
+		result = string(v) + result
+	}
+	return result
 }
 
 type probeQuery struct {
@@ -189,11 +226,19 @@ type PrometheusQuery struct {
 	IntervalFactor uint `json:"intervalFactor"`
 	// Interval       uint   `json:"interval"`
 	// FIXME: Interval can be a string. We need to convert it to int
-	Interval     string `json:"interval"`
+	Interval     string `json:"interval,omitempty"`
 	Format       string `json:"format"`
 	Expression   string `json:"expr"`
-	LegendFormat string `json:"legendFormat"`
-	Step         uint   `json:"step"`
+	LegendFormat string `json:"legendFormat,omitempty"`
+	Step         uint   `json:"step,omitempty"`
+}
+
+func NewPrometheusQuery(datasourceName string) *PrometheusQuery {
+	return &PrometheusQuery{
+		commonQuery: commonQuery{
+			Datasource: &datasourceName,
+		},
+	}
 }
 
 func (q *PrometheusQuery) RefID() string {
@@ -204,11 +249,24 @@ func (q *PrometheusQuery) Datasource() string {
 	return *q.commonQuery.Datasource
 }
 
+func (q *PrometheusQuery) commonOptions() *commonQuery {
+	return &q.commonQuery
+}
+
 // GraphiteQuery is query specific options for Graphite datasource.
 type GraphiteQuery struct {
 	commonQuery
 
-	Target string `json:"target"`
+	Target     string `json:"target"`
+	TargetFull string `json:"targetFull,omitempty"`
+}
+
+func NewGraphiteQuery(datasourceName string) *GraphiteQuery {
+	return &GraphiteQuery{
+		commonQuery: commonQuery{
+			Datasource: &datasourceName,
+		},
+	}
 }
 
 func (q *GraphiteQuery) RefID() string {
@@ -219,7 +277,12 @@ func (q *GraphiteQuery) Datasource() string {
 	return *q.commonQuery.Datasource
 }
 
+func (q *GraphiteQuery) commonOptions() *commonQuery {
+	return &q.commonQuery
+}
+
 type Query interface {
 	RefID() string
 	Datasource() string
+	commonOptions() *commonQuery
 }
