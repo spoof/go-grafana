@@ -179,7 +179,7 @@ func NewRow() *Row {
 	return &Row{Editable: true}
 }
 
-// MarshalJSON implements encoding/json.Marshaler
+// MarshalJSON implements json.Marshaler interface
 func (r *Row) MarshalJSON() ([]byte, error) {
 	type JSONRow Row
 	jr := (*JSONRow)(r)
@@ -191,6 +191,7 @@ func (r *Row) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jr)
 }
 
+// UnmarshalJSON implements json.Unmarshaler interface
 func (r *Row) UnmarshalJSON(data []byte) error {
 	type JSONRow Row
 	jr := struct {
