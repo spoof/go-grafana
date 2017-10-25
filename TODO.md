@@ -11,8 +11,8 @@
             - [ ] Value Mappings
             - [ ] Time Range
         - [ ] Graph (milestone v0.1)
-            - [ ] General
-            - [ ] Metrics
+            - [x] General
+            - [x] Metrics
             - [ ] Axes
             - [ ] Legend
             - [ ] Display
