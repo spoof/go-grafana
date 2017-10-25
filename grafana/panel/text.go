@@ -11,9 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package grafana
-
-import "encoding/json"
+package panel
 
 // TextPanelMode is a type of Text panel.
 type TextPanelMode string
@@ -30,55 +28,16 @@ type TextPanel struct {
 	Content string        `json:"content"`
 	Mode    TextPanelMode `json:"mode"`
 
-	generalOptions PanelGeneralOptions
+	generalOptions GeneralOptions
 }
 
 // NewTextPanel creates new "Text" panel.
 func NewTextPanel(mode TextPanelMode) *TextPanel {
 	return &TextPanel{
 		Mode: mode,
-		generalOptions: PanelGeneralOptions{
-			panelType: textPanel,
-			MinSpan:   12,
-		},
 	}
 }
 
-func (p *TextPanel) GeneralOptions() *PanelGeneralOptions {
+func (p *TextPanel) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
-}
-
-func (p *TextPanel) QueriesOptions() *QueriesOptions {
-	return nil
-}
-
-func (p *TextPanel) MarshalJSON() ([]byte, error) {
-	type JSONPanel TextPanel
-	jp := struct {
-		*JSONPanel
-		*PanelGeneralOptions
-		ID   uint      `json:"id"`
-		Type panelType `json:"type"`
-	}{
-		JSONPanel:           (*JSONPanel)(p),
-		PanelGeneralOptions: p.GeneralOptions(),
-		ID:                  p.GeneralOptions().id,
-		Type:                p.GeneralOptions().panelType,
-	}
-	return json.Marshal(jp)
-}
-
-func (p *TextPanel) UnmarshalJSON(data []byte) error {
-	type JSONPanel TextPanel
-	jp := struct {
-		*JSONPanel
-		*PanelGeneralOptions
-		Type *panelType `json:"type"`
-	}{
-		JSONPanel:           (*JSONPanel)(p),
-		PanelGeneralOptions: p.GeneralOptions(),
-		Type:                &p.GeneralOptions().panelType,
-	}
-
-	return json.Unmarshal(data, &jp)
 }

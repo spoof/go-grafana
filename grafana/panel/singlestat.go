@@ -11,13 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package grafana
-
-import "encoding/json"
+package panel
 
 // SinglestatPanel  represents Singlestat panel.
 type SinglestatPanel struct {
-	PanelGeneralOptions
 
 	// Options. Value.
 	ValueName       string `json:"valueName"`     // Stat: min/max/avg/current/total/name/first/delta/diff/range
@@ -53,60 +50,14 @@ type SinglestatPanel struct {
 		ThresholdMarkers bool `json:"thresholdMarkers"`
 	} `json:"gauge"`
 
-	generalOptions PanelGeneralOptions
-	queriesOptions QueriesOptions
+	generalOptions GeneralOptions
 }
 
 // NewSinglestatPanel creates new "Singlestat" panel.
 func NewSinglestatPanel() *SinglestatPanel {
-	return &SinglestatPanel{
-		generalOptions: PanelGeneralOptions{
-			panelType: singlestatPanel,
-			MinSpan:   12,
-			Links:     []*PanelLink{}, // to make [] in marshaling instead of nil
-		},
-	}
+	return &SinglestatPanel{}
 }
 
-func (p *SinglestatPanel) GeneralOptions() *PanelGeneralOptions {
+func (p *SinglestatPanel) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
-}
-
-func (p *SinglestatPanel) QueriesOptions() *QueriesOptions {
-	return &p.queriesOptions
-}
-
-func (p *SinglestatPanel) MarshalJSON() ([]byte, error) {
-	type JSONPanel SinglestatPanel
-	jp := struct {
-		*JSONPanel
-		*PanelGeneralOptions
-		*QueriesOptions
-		ID   uint      `json:"id"`
-		Type panelType `json:"type"`
-	}{
-		JSONPanel:           (*JSONPanel)(p),
-		PanelGeneralOptions: p.GeneralOptions(),
-		QueriesOptions:      p.QueriesOptions(),
-		ID:                  p.GeneralOptions().id,
-		Type:                p.GeneralOptions().panelType,
-	}
-	return json.Marshal(jp)
-}
-
-func (p *SinglestatPanel) UnmarshalJSON(data []byte) error {
-	type JSONPanel SinglestatPanel
-	jp := struct {
-		*JSONPanel
-		*PanelGeneralOptions
-		*QueriesOptions
-		Type *panelType `json:"type"`
-	}{
-		JSONPanel:           (*JSONPanel)(p),
-		PanelGeneralOptions: p.GeneralOptions(),
-		QueriesOptions:      p.QueriesOptions(),
-		Type:                &p.GeneralOptions().panelType,
-	}
-
-	return json.Unmarshal(data, &jp)
 }

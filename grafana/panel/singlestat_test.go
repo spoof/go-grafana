@@ -11,12 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package grafana
+package panel
 
 import (
 	"encoding/json"
 	"reflect"
 	"testing"
+
+	"github.com/kr/pretty"
+	jsontools "github.com/spoof/go-grafana/pkg/json"
 )
 
 func TestSinglestatPanel_MarshalJSON(t *testing.T) {
@@ -84,21 +87,12 @@ func TestSinglestatPanel_MarshalJSON(t *testing.T) {
 			"minValue": 50,
 			"thresholdLabels": true,
 			"thresholdMarkers": true
-		},
-		"description": "Panel Description",
-		"height": "250px",
-		"links": [],
-		"minSpan": 1,
-		"span": 12,
-		"title": "New Panel",
-		"transparent": true,
-		"id": 0,
-		"type": "singlestat"
+		}
 	}`)
-	if eq, err := JSONBytesEqual(expected, got); err != nil {
+	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
 		t.Fatalf("SinglestatPanel.MarshalJSON returned error %s", err)
 	} else if !eq {
-		t.Errorf("SinglestatPanel.MarshalJSON:\nexpected: %s\ngot: %s", expected, got)
+		t.Errorf("SinglestatPanel.MarshalJSON: %s", pretty.Diff(expected, &got))
 	}
 }
 
@@ -126,14 +120,6 @@ func TestSinglestatPanel_UnmarshalJSON(t *testing.T) {
 	expected.Gauge.MinValue = 50
 	expected.Gauge.ThresholdLabels = true
 	expected.Gauge.ThresholdMarkers = true
-
-	options := expected.GeneralOptions()
-	options.Title = "New Panel"
-	options.Description = "Panel Description"
-	options.Height = "250px"
-	options.MinSpan = 1
-	options.Span = 12
-	options.Transparent = true
 
 	data := []byte(`{
 		"valueName": "max",
@@ -163,16 +149,7 @@ func TestSinglestatPanel_UnmarshalJSON(t *testing.T) {
 			"minValue": 50,
 			"thresholdLabels": true,
 			"thresholdMarkers": true
-		},
-		"description": "Panel Description",
-		"height": "250px",
-		"links": [],
-		"minSpan": 1,
-		"span": 12,
-		"title": "New Panel",
-		"transparent": true,
-		"id": 0,
-		"type": "singlestat"
+		}
 	}`)
 	var got SinglestatPanel
 	err := json.Unmarshal(data, &got)
@@ -181,6 +158,6 @@ func TestSinglestatPanel_UnmarshalJSON(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expected, &got) {
-		t.Errorf("SinglestatPanel.MarshalJSON:\nexpected: %#v\ngot: %#v", expected, &got)
+		t.Errorf("SinglestatPanel.UnmarshalJSON: %s", pretty.Diff(expected, &got))
 	}
 }
