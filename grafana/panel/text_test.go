@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package panel
+package panel_test
 
 import (
 	"encoding/json"
@@ -19,14 +19,15 @@ import (
 	"testing"
 
 	"github.com/kr/pretty"
+	"github.com/spoof/go-grafana/grafana/panel"
 	jsontools "github.com/spoof/go-grafana/pkg/json"
 )
 
 func TestTextPanel_MarshalJSON(t *testing.T) {
-	panel := NewTextPanel(TextPanelMarkdownMode)
-	panel.Content = "some content"
+	p := panel.NewText(panel.TextPanelMarkdownMode)
+	p.Content = "some content"
 
-	got, err := json.MarshalIndent(panel, "", "\t\t")
+	got, err := json.MarshalIndent(p, "", "\t\t")
 	if err != nil {
 		t.Fatalf("TextPanel.MarshalJSON returned error %s", err)
 	}
@@ -42,14 +43,14 @@ func TestTextPanel_MarshalJSON(t *testing.T) {
 }
 
 func TestTextPanel_UnmarshalJSON(t *testing.T) {
-	expected := NewTextPanel(TextPanelHTMLMode)
+	expected := panel.NewText(panel.TextPanelHTMLMode)
 	expected.Content = "some content"
 
 	data := []byte(`{
 		"content": "some content",
 		"mode": "html"
 	}`)
-	var got TextPanel
+	var got panel.Text
 	err := json.Unmarshal(data, &got)
 	if err != nil {
 		t.Fatalf("TextPanel.UnmarshalJSON returned error %s", err)

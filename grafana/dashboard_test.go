@@ -51,7 +51,7 @@ func TestDashboard_MarshalJSON(t *testing.T) {
 	row1.ShowTitle = true
 	row1.Title = "Row Title 1"
 	row1.TitleSize = "h1"
-	p1 := panel.NewTextPanel(panel.TextPanelHTMLMode)
+	p1 := panel.NewText(panel.TextPanelHTMLMode)
 	p1.Content = "Content 1"
 	opts1 := p1.GeneralOptions()
 	opts1.Description = "Panel Description 1"
@@ -69,7 +69,7 @@ func TestDashboard_MarshalJSON(t *testing.T) {
 	row2.ShowTitle = true
 	row2.Title = "Row Title 2"
 	row2.TitleSize = "h2"
-	p2 := panel.NewTextPanel(panel.TextPanelHTMLMode)
+	p2 := panel.NewText(panel.TextPanelHTMLMode)
 	p2.Content = "Content 2"
 	opts2 := p2.GeneralOptions()
 	opts2.Description = "Panel Description 2"
@@ -210,7 +210,7 @@ func TestProbePanel_UnmarshalJSON(t *testing.T) {
 		t.Errorf("probePanel.UnmarshalJSON. got.GeneralOptions() shouldn't be nil")
 	}
 
-	epxectedPanel := panel.NewTextPanel(panel.TextPanelMarkdownMode)
+	epxectedPanel := panel.NewText(panel.TextPanelMarkdownMode)
 	epxectedPanel.Content = "Content"
 	epxectedPanel.Mode = panel.TextPanelTextMode
 	expected := &probePanel{ID: 1, Type: textPanel, panel: epxectedPanel}
@@ -227,7 +227,7 @@ func TestProbePanel_UnmarshalJSON(t *testing.T) {
 }
 
 func TestProbePanel_MarshalJSON(t *testing.T) {
-	panel := panel.NewTextPanel(panel.TextPanelMarkdownMode)
+	panel := panel.NewText(panel.TextPanelMarkdownMode)
 	panel.Content = "Content"
 	opts := panel.GeneralOptions()
 	opts.Description = "Panel Description"

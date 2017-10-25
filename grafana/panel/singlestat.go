@@ -13,8 +13,8 @@
 
 package panel
 
-// SinglestatPanel  represents Singlestat panel.
-type SinglestatPanel struct {
+// Singlestat  represents Singlestat panel.
+type Singlestat struct {
 
 	// Options. Value.
 	ValueName       string `json:"valueName"`     // Stat: min/max/avg/current/total/name/first/delta/diff/range
@@ -53,11 +53,11 @@ type SinglestatPanel struct {
 	generalOptions GeneralOptions
 }
 
-// NewSinglestatPanel creates new "Singlestat" panel.
-func NewSinglestatPanel() *SinglestatPanel {
-	return &SinglestatPanel{}
+// NewSinglestat creates new "Singlestat" panel.
+func NewSinglestat() *Singlestat {
+	return &Singlestat{}
 }
 
-func (p *SinglestatPanel) GeneralOptions() *GeneralOptions {
+func (p *Singlestat) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
 }

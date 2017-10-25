@@ -212,11 +212,11 @@ func (p *probePanel) UnmarshalJSON(data []byte) error {
 	var pp Panel
 	switch jp.Type {
 	case textPanel:
-		pp = new(panel.TextPanel)
+		pp = new(panel.Text)
 	case singlestatPanel:
-		pp = new(panel.SinglestatPanel)
+		pp = new(panel.Singlestat)
 	case graphPanel:
-		pp = new(panel.GraphPanel)
+		pp = new(panel.Graph)
 	default:
 		return nil
 	}
@@ -247,9 +247,9 @@ func (p *probePanel) MarshalJSON() ([]byte, error) {
 	jp := struct {
 		*JSONPanel
 
-		*panel.TextPanel
-		*panel.SinglestatPanel
-		*panel.GraphPanel
+		*panel.Text
+		*panel.Singlestat
+		*panel.Graph
 
 		*panel.GeneralOptions
 	}{
@@ -258,14 +258,14 @@ func (p *probePanel) MarshalJSON() ([]byte, error) {
 	}
 
 	switch v := p.panel.(type) {
-	case *panel.TextPanel:
-		jp.TextPanel = v
+	case *panel.Text:
+		jp.Text = v
 		jp.Type = textPanel
-	case *panel.SinglestatPanel:
-		jp.SinglestatPanel = v
+	case *panel.Singlestat:
+		jp.Singlestat = v
 		jp.Type = singlestatPanel
-	case *panel.GraphPanel:
-		jp.GraphPanel = v
+	case *panel.Graph:
+		jp.Graph = v
 		jp.Type = graphPanel
 	}
 	return json.Marshal(jp)

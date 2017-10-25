@@ -13,31 +13,31 @@
 
 package panel
 
-// TextPanelMode is a type of Text panel.
-type TextPanelMode string
+// textPanelMode is a type of Text panel.
+type textPanelMode string
 
 // This is all possible types (modes) of Text panel.
 const (
-	TextPanelHTMLMode     TextPanelMode = "html"
-	TextPanelMarkdownMode TextPanelMode = "markdown"
-	TextPanelTextMode     TextPanelMode = "text"
+	TextPanelHTMLMode     textPanelMode = "html"
+	TextPanelMarkdownMode textPanelMode = "markdown"
+	TextPanelTextMode     textPanelMode = "text"
 )
 
-// TextPanel represents Text Panel
-type TextPanel struct {
+// Text represents Text Panel
+type Text struct {
 	Content string        `json:"content"`
-	Mode    TextPanelMode `json:"mode"`
+	Mode    textPanelMode `json:"mode"`
 
 	generalOptions GeneralOptions
 }
 
-// NewTextPanel creates new "Text" panel.
-func NewTextPanel(mode TextPanelMode) *TextPanel {
-	return &TextPanel{
+// NewText creates new "Text" panel.
+func NewText(mode textPanelMode) *Text {
+	return &Text{
 		Mode: mode,
 	}
 }
 
-func (p *TextPanel) GeneralOptions() *GeneralOptions {
+func (p *Text) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
 }

@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package panel
+package panel_test
 
 import (
 	"encoding/json"
@@ -19,11 +19,12 @@ import (
 	"testing"
 
 	"github.com/kr/pretty"
+	"github.com/spoof/go-grafana/grafana/panel"
 	jsontools "github.com/spoof/go-grafana/pkg/json"
 )
 
-func TestSinglestatPanel_MarshalJSON(t *testing.T) {
-	panel := NewSinglestatPanel()
+func TestSinglestat_MarshalJSON(t *testing.T) {
+	panel := panel.NewSinglestat()
 	panel.ValueName = "max"
 	panel.ValueFontSize = "50%"
 	panel.Prefix = "prefix"
@@ -90,14 +91,14 @@ func TestSinglestatPanel_MarshalJSON(t *testing.T) {
 		}
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
-		t.Fatalf("SinglestatPanel.MarshalJSON returned error %s", err)
+		t.Fatalf("Singlestat.MarshalJSON returned error %s", err)
 	} else if !eq {
-		t.Errorf("SinglestatPanel.MarshalJSON: %s", pretty.Diff(expected, &got))
+		t.Errorf("Singlestat.MarshalJSON: %s", pretty.Diff(expected, &got))
 	}
 }
 
-func TestSinglestatPanel_UnmarshalJSON(t *testing.T) {
-	expected := NewSinglestatPanel()
+func TestSinglestat_UnmarshalJSON(t *testing.T) {
+	expected := panel.NewSinglestat()
 	expected.ValueName = "max"
 	expected.ValueFontSize = "50%"
 	expected.Prefix = "prefix"
@@ -151,13 +152,13 @@ func TestSinglestatPanel_UnmarshalJSON(t *testing.T) {
 			"thresholdMarkers": true
 		}
 	}`)
-	var got SinglestatPanel
+	var got panel.Singlestat
 	err := json.Unmarshal(data, &got)
 	if err != nil {
-		t.Fatalf("SinglestatPanel.UnmarshalJSON returned error %s", err)
+		t.Fatalf("Singlestat.UnmarshalJSON returned error %s", err)
 	}
 
 	if !reflect.DeepEqual(expected, &got) {
-		t.Errorf("SinglestatPanel.UnmarshalJSON: %s", pretty.Diff(expected, &got))
+		t.Errorf("Singlestat.UnmarshalJSON: %s", pretty.Diff(expected, &got))
 	}
 }

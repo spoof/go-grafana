@@ -13,17 +13,17 @@
 
 package panel
 
-// GraphPanel represents Graph panel
-type GraphPanel struct {
+// Graph represents Graph panel
+type Graph struct {
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
 }
 
-// NewGraphPanel creates new Graph panel.
-func NewGraphPanel() *GraphPanel {
-	return &GraphPanel{}
+// NewGraph creates new Graph panel.
+func NewGraph() *Graph {
+	return &Graph{}
 }
 
-func (p *GraphPanel) GeneralOptions() *GeneralOptions {
+func (p *Graph) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
 }
