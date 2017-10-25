@@ -182,9 +182,9 @@ type Panel interface {
 type panelType string
 
 const (
-	textPanel       panelType = "text"
-	singlestatPanel panelType = "singlestat"
-	graphPanel      panelType = "graph"
+	textPanelType       panelType = "text"
+	singlestatPanelType panelType = "singlestat"
+	graphPanelType      panelType = "graph"
 )
 
 type probePanel struct {
@@ -211,11 +211,11 @@ func (p *probePanel) UnmarshalJSON(data []byte) error {
 
 	var pp Panel
 	switch jp.Type {
-	case textPanel:
+	case textPanelType:
 		pp = new(panel.Text)
-	case singlestatPanel:
+	case singlestatPanelType:
 		pp = new(panel.Singlestat)
-	case graphPanel:
+	case graphPanelType:
 		pp = new(panel.Graph)
 	default:
 		return nil
@@ -260,13 +260,13 @@ func (p *probePanel) MarshalJSON() ([]byte, error) {
 	switch v := p.panel.(type) {
 	case *panel.Text:
 		jp.Text = v
-		jp.Type = textPanel
+		jp.Type = textPanelType
 	case *panel.Singlestat:
 		jp.Singlestat = v
-		jp.Type = singlestatPanel
+		jp.Type = singlestatPanelType
 	case *panel.Graph:
 		jp.Graph = v
-		jp.Type = graphPanel
+		jp.Type = graphPanelType
 	}
 	return json.Marshal(jp)
 }

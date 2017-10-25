@@ -213,7 +213,7 @@ func TestProbePanel_UnmarshalJSON(t *testing.T) {
 	epxectedPanel := panel.NewText(panel.TextPanelMarkdownMode)
 	epxectedPanel.Content = "Content"
 	epxectedPanel.Mode = panel.TextPanelTextMode
-	expected := &probePanel{ID: 1, Type: textPanel, panel: epxectedPanel}
+	expected := &probePanel{ID: 1, Type: textPanelType, panel: epxectedPanel}
 	opts := expected.GeneralOptions()
 	opts.Description = "Panel Description"
 	opts.Height = "250px"
@@ -236,7 +236,7 @@ func TestProbePanel_MarshalJSON(t *testing.T) {
 	opts.MinSpan = 1
 	opts.Span = 12
 	opts.Transparent = true
-	pp := &probePanel{ID: 1, Type: textPanel, panel: panel}
+	pp := &probePanel{ID: 1, Type: textPanelType, panel: panel}
 
 	got, err := json.MarshalIndent(pp, "", "\t\t")
 	if err != nil {
