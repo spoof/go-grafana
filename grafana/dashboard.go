@@ -271,11 +271,6 @@ func (p *probePanel) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jp)
 }
 
-type panelGeneralOptions struct {
-	id        uint
-	panelType panelType
-}
-
 type probeQuery struct {
 	// PrometheusQuery
 	IntervalFactor *uint   `json:"intervalFactor"`
