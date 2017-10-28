@@ -31,6 +31,7 @@ const (
 
 // Graph represents Graph panel
 type Graph struct {
+	// Axes
 	YAxes GraphYaxesOptions `json:"yaxes"`
 	XAxis struct {
 		Buckets null.Int       `json:"buckets,omitempty"`
@@ -39,6 +40,23 @@ type Graph struct {
 		Show    bool           `json:"show"`
 		Values  []string       `json:"values"` // TODO: actually it's only single value here. Need custom type
 	} `json:"xaxis"`
+
+	// Legend
+	Legend struct {
+		AsTable   bool     `json:"alignAsTable"`
+		Avg       bool     `json:"avg"`
+		Current   bool     `json:"current"`
+		HideEmpty bool     `json:"hideEmpty"`
+		HideZero  bool     `json:"hideZero"`
+		Max       bool     `json:"max"`
+		Min       bool     `json:"min"`
+		AtRight   bool     `json:"rightSide"`
+		Show      bool     `json:"show"`
+		Width     null.Int `json:"sideWidth"`
+		Total     bool     `json:"total"`
+		Values    bool     `json:"values"`
+	} `json:"legend"`
+	Decimals null.Int `json:"decimals"`
 
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
@@ -69,6 +87,7 @@ func (y *GraphYaxesOptions) MarshalJSON() ([]byte, error) {
 	axes := []GraphYAxis{y.Left, y.Right}
 	return json.Marshal(axes)
 }
+
 func (y *GraphYaxesOptions) UnmarshalJSON(data []byte) error {
 	var axes []GraphYAxis
 	if err := json.Unmarshal(data, &axes); err != nil {

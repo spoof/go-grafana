@@ -14,7 +14,7 @@
             - [x] General
             - [x] Metrics
             - [x] Axes
-            - [ ] Legend
+            - [x] Legend
             - [ ] Display
                 - [ ] Draw Options
                 - [ ] Series Overrides

@@ -12,15 +12,15 @@ import (
 )
 
 func TestGraph_MarshalJSON(t *testing.T) {
-	panel := NewGraph()
+	p := NewGraph()
 	leftMin := field.ForceString("0")
 	rightMax := field.ForceString("10")
 
-	panel.XAxis.Buckets = null.IntFrom(1)
-	panel.XAxis.Mode = "series"
-	panel.XAxis.Show = true
-	panel.XAxis.Values = []string{"max"}
-	panel.YAxes = GraphYaxesOptions{
+	p.XAxis.Buckets = null.IntFrom(1)
+	p.XAxis.Mode = "series"
+	p.XAxis.Show = true
+	p.XAxis.Values = []string{"max"}
+	p.YAxes = GraphYaxesOptions{
 		Left: GraphYAxis{
 			Format:  "dtdurations",
 			Label:   "label1",
@@ -38,11 +38,24 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			Show:    false,
 		},
 	}
-	got, err := json.MarshalIndent(panel, "", "\t")
+	p.Legend.AsTable = true
+	p.Legend.Avg = true
+	p.Legend.Current = true
+	p.Legend.HideEmpty = true
+	p.Legend.HideZero = true
+	p.Legend.Max = true
+	p.Legend.Min = true
+	p.Legend.AtRight = true
+	p.Legend.Show = true
+	p.Legend.Width = null.IntFromPtr(nil)
+	p.Legend.Total = true
+	p.Legend.Values = true
+	got, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
 	}
 	expected := []byte(`{
+		"decimals": null,
 		"xaxis": {
 			"buckets": 1,
 			"mode": "series",
@@ -63,7 +76,21 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			"max": "10",
 			"min": null,
 			"show": false
-		}]
+		}],
+		"legend": {
+			"alignAsTable": true,
+			"avg": true,
+			"current": true,
+			"hideEmpty": true,
+			"hideZero": true,
+			"max": true,
+			"min": true,
+			"rightSide": true,
+			"show": true,
+			"sideWidth": null,
+			"total": true,
+			"values": true
+		}
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
@@ -73,6 +100,7 @@ func TestGraph_MarshalJSON(t *testing.T) {
 }
 func TestGraph_UnmarshalJSON(t *testing.T) {
 	data := []byte(`{
+		"decimals": 3,
 		"xaxis": {
 			"buckets": null,
 			"mode": "histogram",
@@ -93,7 +121,21 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			"max": null,
 			"min": null,
 			"show": false
-		}]
+		}],
+		"legend": {
+			"alignAsTable": true,
+			"avg": true,
+			"current": true,
+			"hideEmpty": true,
+			"hideZero": true,
+			"max": true,
+			"min": true,
+			"rightSide": true,
+			"show": true,
+			"sideWidth": 100,
+			"total": true,
+			"values": true
+		}
 	}`)
 	var graph Graph
 	err := json.Unmarshal(data, &graph)
@@ -124,6 +166,19 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			Show:    false,
 		},
 	}
+	expected.Legend.AsTable = true
+	expected.Legend.Avg = true
+	expected.Legend.Current = true
+	expected.Legend.HideEmpty = true
+	expected.Legend.HideZero = true
+	expected.Legend.Max = true
+	expected.Legend.Min = true
+	expected.Legend.AtRight = true
+	expected.Legend.Show = true
+	expected.Legend.Width = null.IntFrom(100)
+	expected.Legend.Total = true
+	expected.Legend.Values = true
+	expected.Decimals = null.IntFrom(3)
 	if !reflect.DeepEqual(expected, &graph) {
 		t.Errorf("Graph.UnmarshalJSON: %s", pretty.Diff(expected, &graph))
 	}
