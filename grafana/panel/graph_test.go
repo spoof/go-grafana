@@ -38,6 +38,7 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			Show:    false,
 		},
 	}
+	// Legend
 	p.Legend.AsTable = true
 	p.Legend.Avg = true
 	p.Legend.Current = true
@@ -50,6 +51,20 @@ func TestGraph_MarshalJSON(t *testing.T) {
 	p.Legend.Width = null.IntFromPtr(nil)
 	p.Legend.Total = true
 	p.Legend.Values = true
+	// Draw options
+	p.DrawOptions.Bars = true
+	p.DrawOptions.Lines = true
+	p.DrawOptions.Points = true
+	p.DrawOptions.Fill = 2
+	p.DrawOptions.LineWidth = 3
+	p.DrawOptions.PointRadius = 4
+	p.DrawOptions.Staircase = true
+	p.Tooltip.Shared = true
+	p.Tooltip.Sort = Desc
+	p.Tooltip.StackedValue = Individual
+	p.DrawOptions.Stack = true
+	p.DrawOptions.NullValue = NullAsZeroPointMode
+
 	got, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
@@ -90,6 +105,20 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			"sideWidth": null,
 			"total": true,
 			"values": true
+		},
+		"stack": true,
+		"nullPointMode": "null as zero",
+		"bars": true,
+		"lines": true,
+		"points": true,
+		"fill": 2,
+		"linewidth": 3,
+		"steppedLine": true,
+		"pointradius": 4,
+		"tooltip": {
+			"shared": true,
+			"sort": 2,
+			"value_type": "individual"
 		}
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
@@ -135,7 +164,22 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			"sideWidth": 100,
 			"total": true,
 			"values": true
+		},
+		"stack": true,
+		"nullPointMode": "connected",
+		"bars": true,
+		"lines": true,
+		"points": true,
+		"fill": 2,
+		"linewidth": 3,
+		"steppedLine": true,
+		"pointradius": 4,
+		"tooltip": {
+			"shared": true,
+			"sort": 1,
+			"value_type": "cumulative"
 		}
+
 	}`)
 	var graph Graph
 	err := json.Unmarshal(data, &graph)
@@ -179,6 +223,21 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 	expected.Legend.Total = true
 	expected.Legend.Values = true
 	expected.Decimals = null.IntFrom(3)
+
+	// Draw options
+	expected.DrawOptions.Bars = true
+	expected.DrawOptions.Lines = true
+	expected.DrawOptions.Points = true
+	expected.DrawOptions.Fill = 2
+	expected.DrawOptions.LineWidth = 3
+	expected.DrawOptions.PointRadius = 4
+	expected.DrawOptions.Staircase = true
+	expected.Tooltip.Shared = true
+	expected.Tooltip.Sort = Asc
+	expected.Tooltip.StackedValue = Cumulative
+	expected.DrawOptions.Stack = true
+	expected.DrawOptions.NullValue = ConnectedNullPointMode
+
 	if !reflect.DeepEqual(expected, &graph) {
 		t.Errorf("Graph.UnmarshalJSON: %s", pretty.Diff(expected, &graph))
 	}

@@ -29,6 +29,29 @@ const (
 	graphXAxisTime      graphXAxisMode = "time"
 )
 
+type sortType uint
+
+const (
+	NoSort sortType = iota
+	Asc
+	Desc
+)
+
+type stackedValueType string
+
+const (
+	Individual stackedValueType = "individual"
+	Cumulative stackedValueType = "cumulative"
+)
+
+type nullPointMode string
+
+const (
+	ConnectedNullPointMode nullPointMode = "connected"
+	NullNullPointMode      nullPointMode = "null"
+	NullAsZeroPointMode    nullPointMode = "null as zero"
+)
+
 // Graph represents Graph panel
 type Graph struct {
 	// Axes
@@ -58,6 +81,15 @@ type Graph struct {
 	} `json:"legend"`
 	Decimals null.Int `json:"decimals"`
 
+	// Display
+	DrawOptions
+	Tooltip struct {
+		// All series or single
+		Shared       bool             `json:"shared"`
+		Sort         sortType         `json:"sort"`
+		StackedValue stackedValueType `json:"value_type"`
+	} `json:"tooltip"`
+
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
 	queries []Query
@@ -66,6 +98,21 @@ type Graph struct {
 // NewGraph creates new Graph panel.
 func NewGraph() *Graph {
 	return &Graph{}
+}
+
+type DrawOptions struct {
+	Bars   bool `json:"bars"`
+	Lines  bool `json:"lines"`
+	Points bool `json:"points"`
+
+	// Options
+	Fill        uint `json:"fill"`
+	LineWidth   uint `json:"linewidth"`
+	Staircase   bool `json:"steppedLine"`
+	PointRadius uint `json:"pointradius,omitempty"`
+
+	Stack     bool          `json:"stack"`
+	NullValue nullPointMode `json:"nullPointMode"`
 }
 
 // GeneralOptions implements grafana.Panel interface
