@@ -42,7 +42,7 @@ func TestDashboard_MarshalJSON(t *testing.T) {
 	d.HideControls = true
 	d.Style = dashboardLightStyle
 	d.Timezone = "MSK"
-	d.tags = field.NewTags("tag1", "tag2")
+	d.Tags = field.NewTags("tag1", "tag2")
 
 	row1 := NewRow()
 	row1.Collapsed = true
@@ -178,7 +178,7 @@ func TestDashboard_UnmarshalJSON(t *testing.T) {
 	expected.HideControls = true
 	expected.Style = dashboardLightStyle
 	expected.Timezone = "msk"
-	expected.tags = field.NewTags("tag1", "tag2")
+	expected.Tags = field.NewTags("tag1", "tag2")
 
 	if !reflect.DeepEqual(&got, expected) {
 		t.Errorf("Dashboard.UnmarshalJSON: %s", pretty.Diff(&got, expected))

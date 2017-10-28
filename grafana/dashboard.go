@@ -43,7 +43,7 @@ type Dashboard struct {
 	Style        dashboardStyle `json:"style"`
 	Timezone     string         `json:"timezone"`
 	Title        string         `json:"title"`
-	tags         *field.Tags
+	Tags         *field.Tags    `json:"tags"`
 
 	Meta *DashboardMeta `json:"-"`
 }
@@ -55,7 +55,7 @@ func NewDashboard(title string) *Dashboard {
 		Editable:      true,
 		SchemaVersion: 14,
 		Style:         dashboardDarkStyle,
-		tags:          field.NewTags(),
+		Tags:          field.NewTags(),
 	}
 }
 
@@ -86,7 +86,7 @@ func (d *Dashboard) MarshalJSON() ([]byte, error) {
 	}{
 		JSONDashboard: (JSONDashboard)(*d),
 		Rows:          rows,
-		Tags:          d.tags.Value(),
+		Tags:          d.Tags.Value(),
 	}
 	return json.Marshal(jd)
 }
@@ -111,7 +111,7 @@ func (d *Dashboard) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	d.tags = field.NewTags(inDashboard.Tags...)
+	d.Tags = field.NewTags(inDashboard.Tags...)
 
 	return nil
 }
