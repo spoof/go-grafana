@@ -20,7 +20,7 @@ import (
 type GeneralOptions struct {
 	Description string            `json:"description"`
 	Height      field.ForceString `json:"height"`
-	Links       []*PanelLink      `json:"links"`
+	Links       []PanelLink       `json:"links"`
 	MinSpan     uint              `json:"minSpan"` // TODO: valid values: 1-12
 	Span        uint              `json:"span"`    // TODO: valid values: 1-12
 	Title       string            `json:"title"`
