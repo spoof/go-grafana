@@ -17,12 +17,28 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/guregu/null"
 	"github.com/spoof/go-grafana/pkg/field"
+)
+
+type graphXAxisMode string
+
+const (
+	graphXAxisHistogram graphXAxisMode = "histogram"
+	graphXAxisSeries    graphXAxisMode = "series"
+	graphXAxisTime      graphXAxisMode = "time"
 )
 
 // Graph represents Graph panel
 type Graph struct {
 	YAxes GraphYaxesOptions `json:"yaxes"`
+	XAxis struct {
+		Buckets null.Int       `json:"buckets,omitempty"`
+		Mode    graphXAxisMode `json:"mode"`           // TODO: add validaition here: histogram/series/time
+		Name    *string        `json:"name,omitempty"` // it's seems that it's not used anymore
+		Show    bool           `json:"show"`
+		Values  []string       `json:"values"` // TODO: actually it's only single value here. Need custom type
+	} `json:"xaxis"`
 
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
@@ -49,11 +65,11 @@ type GraphYaxesOptions struct {
 	Right GraphYAxis
 }
 
-func (axe *GraphYaxesOptions) MarshalJSON() ([]byte, error) {
-	axes := []GraphYAxis{axe.Left, axe.Right}
+func (y *GraphYaxesOptions) MarshalJSON() ([]byte, error) {
+	axes := []GraphYAxis{y.Left, y.Right}
 	return json.Marshal(axes)
 }
-func (axe *GraphYaxesOptions) UnmarshalJSON(data []byte) error {
+func (y *GraphYaxesOptions) UnmarshalJSON(data []byte) error {
 	var axes []GraphYAxis
 	if err := json.Unmarshal(data, &axes); err != nil {
 		return err
@@ -62,16 +78,16 @@ func (axe *GraphYaxesOptions) UnmarshalJSON(data []byte) error {
 		return errors.New("Axes should be 2")
 	}
 
-	axe.Left = axes[0]
-	axe.Right = axes[1]
+	y.Left = axes[0]
+	y.Right = axes[1]
 
 	return nil
 }
 
 type GraphYAxis struct {
-	Format  string             `json:"format"`
+	Format  string             `json:"format"` // TODO: replace with custom type with default value "short".
 	Label   string             `json:"label,omitempty"`
-	LogBase int                `json:"logBase"`
+	LogBase int                `json:"logBase"` // TODO: default value should be 1 (linear)
 	Max     *field.ForceString `json:"max"`
 	Min     *field.ForceString `json:"min"`
 	Show    bool               `json:"show"`

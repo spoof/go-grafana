@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/guregu/null"
 	"github.com/kr/pretty"
 	"github.com/spoof/go-grafana/pkg/field"
 	jsontools "github.com/spoof/go-grafana/pkg/json"
@@ -15,6 +16,10 @@ func TestGraph_MarshalJSON(t *testing.T) {
 	leftMin := field.ForceString("0")
 	rightMax := field.ForceString("10")
 
+	panel.XAxis.Buckets = null.IntFrom(1)
+	panel.XAxis.Mode = "series"
+	panel.XAxis.Show = true
+	panel.XAxis.Values = []string{"max"}
 	panel.YAxes = GraphYaxesOptions{
 		Left: GraphYAxis{
 			Format:  "dtdurations",
@@ -38,6 +43,12 @@ func TestGraph_MarshalJSON(t *testing.T) {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
 	}
 	expected := []byte(`{
+		"xaxis": {
+			"buckets": 1,
+			"mode": "series",
+			"show": true,
+			"values": ["max"]
+		},
 		"yaxes": [{
 			"format": "dtdurations",
 			"label": "label1",
@@ -62,6 +73,12 @@ func TestGraph_MarshalJSON(t *testing.T) {
 }
 func TestGraph_UnmarshalJSON(t *testing.T) {
 	data := []byte(`{
+		"xaxis": {
+			"buckets": null,
+			"mode": "histogram",
+			"show": true,
+			"value": []
+		},
 		"yaxes": [{
 			"format": "dtdurations",
 			"label": "label1",
@@ -85,6 +102,9 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 	}
 
 	expected := NewGraph()
+	expected.XAxis.Buckets = null.IntFromPtr(nil)
+	expected.XAxis.Mode = "histogram"
+	expected.XAxis.Show = true
 	leftMin := field.ForceString("0")
 	expected.YAxes = GraphYaxesOptions{
 		Left: GraphYAxis{

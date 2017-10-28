@@ -8,6 +8,12 @@
   revision = "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
 
 [[projects]]
+  name = "github.com/guregu/null"
+  packages = ["."]
+  revision = "5d2d1e5a9e25088fb9cc0b0f7cb566250eb42bba"
+  version = "v3.2.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/kr/pretty"
   packages = ["."]
@@ -22,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4249bdcd3f49bb155e1f20630c42607bb0cf4e17542ad1a9db58bf2eb861d59f"
+  inputs-digest = "09914cb54a785dca0d1a755cf654bb80b25932f76be7e8e578fd4b9193754c8f"
   solver-name = "gps-cdcl"
   solver-version = 1

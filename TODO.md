@@ -13,7 +13,7 @@
         - [ ] Graph (milestone v0.1)
             - [x] General
             - [x] Metrics
-            - [ ] Axes
+            - [x] Axes
             - [ ] Legend
             - [ ] Display
                 - [ ] Draw Options
