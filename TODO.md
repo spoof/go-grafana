@@ -6,7 +6,7 @@
             - [x] Options
         - [ ] Singlestat (milestone v0.1)
             - [x] General
-            - [ ] Metrics
+            - [x] Metrics
             - [x] Options
             - [ ] Value Mappings
             - [ ] Time Range
