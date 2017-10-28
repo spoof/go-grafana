@@ -55,4 +55,10 @@ func NewPanelLink(linkType panelLinkType) *PanelLink {
 	return &PanelLink{
 		Type: linkType,
 	}
+
+}
+
+// Query is interface describes behaviour that we want from panel's queries
+type Query interface {
+	Datasource() string
 }

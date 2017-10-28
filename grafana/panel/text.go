@@ -38,6 +38,7 @@ func NewText(mode textPanelMode) *Text {
 	}
 }
 
+// GeneralOptions implements grafana.Panel interface
 func (p *Text) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
 }

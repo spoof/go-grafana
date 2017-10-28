@@ -51,6 +51,7 @@ type Singlestat struct {
 	} `json:"gauge"`
 
 	generalOptions GeneralOptions
+	queries        []Query
 }
 
 // NewSinglestat creates new "Singlestat" panel.
@@ -58,6 +59,12 @@ func NewSinglestat() *Singlestat {
 	return &Singlestat{}
 }
 
+// GeneralOptions implements grafana.Panel interface
 func (p *Singlestat) GeneralOptions() *GeneralOptions {
 	return &p.generalOptions
+}
+
+// Queries implements Queryable interface
+func (p *Singlestat) Queries() *[]Query {
+	return &p.queries
 }

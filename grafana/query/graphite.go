@@ -11,26 +11,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package panel
+package query
 
-// Graph represents Graph panel
-type Graph struct {
-	generalOptions GeneralOptions
-	//queriesOptions QueriesOptions
-	queries []Query
+// Graphite is query specific options for Graphite datasource.
+type Graphite struct {
+	Target     string `json:"target"`
+	TargetFull string `json:"targetFull,omitempty"`
+
+	datasource string
 }
 
-// NewGraph creates new Graph panel.
-func NewGraph() *Graph {
-	return &Graph{}
+// NewGraphite creates new instance of Graphite query
+func NewGraphite(datasourceName string) *Graphite {
+	return &Graphite{
+		datasource: datasourceName,
+	}
 }
 
-// GeneralOptions implements grafana.Panel interface
-func (p *Graph) GeneralOptions() *GeneralOptions {
-	return &p.generalOptions
-}
-
-// Queries implements Queryable interface
-func (p *Graph) Queries() *[]Query {
-	return &p.queries
+// Datasource implements panel.Query interface
+func (q *Graphite) Datasource() string {
+	return q.datasource
 }

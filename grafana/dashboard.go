@@ -18,10 +18,12 @@ import (
 	"time"
 
 	"github.com/spoof/go-grafana/grafana/panel"
+	panelQuery "github.com/spoof/go-grafana/grafana/query"
 	"github.com/spoof/go-grafana/pkg/field"
 )
 
 type (
+	// DashboardID is an ID type of Dashboard
 	DashboardID    uint64
 	dashboardStyle string
 )
@@ -175,6 +177,7 @@ func (r *Row) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+//Panel represents Dashboard's panel
 type Panel interface {
 	GeneralOptions() *panel.GeneralOptions
 }
@@ -225,6 +228,7 @@ func (p *probePanel) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	// Unmarshal general options
 	var generalOptions panel.GeneralOptions
 	if err := json.Unmarshal(data, &generalOptions); err != nil {
 		return err
@@ -232,10 +236,22 @@ func (p *probePanel) UnmarshalJSON(data []byte) error {
 	gOpts := pp.GeneralOptions()
 	*gOpts = generalOptions
 
-	//var queriesOptions PanelQueriesOptions
-	//if err := json.Unmarshal(data, &queriesOptions); err != nil {
-	//	return err
-	//}
+	// Unmarshal queries
+	var queriesOpts queriesOptions
+	if err := json.Unmarshal(data, &queriesOpts); err != nil {
+		return err
+	}
+	if queryablePanel, ok := pp.(QueryablePanel); ok {
+		queriesPtr := queryablePanel.Queries()
+		newQueries := []panel.Query{}
+		for _, q := range queriesOpts.Queries {
+			if q.query == nil {
+				continue
+			}
+			newQueries = append(newQueries, q.query)
+		}
+		*queriesPtr = newQueries
+	}
 
 	p.panel = pp
 	return nil
@@ -252,6 +268,7 @@ func (p *probePanel) MarshalJSON() ([]byte, error) {
 		*panel.Graph
 
 		*panel.GeneralOptions
+		*queriesOptions
 	}{
 		JSONPanel:      (*JSONPanel)(p),
 		GeneralOptions: p.GeneralOptions(),
@@ -268,102 +285,130 @@ func (p *probePanel) MarshalJSON() ([]byte, error) {
 		jp.Graph = v
 		jp.Type = graphPanelType
 	}
+
+	if qp, ok := p.panel.(QueryablePanel); ok {
+		// Determine do each query uses its own datassource or not
+		isOwnDatasource := false
+		queries := *qp.Queries()
+		for i := 0; i < len(queries)-1; i++ {
+			if queries[i].Datasource() != queries[i+1].Datasource() {
+				isOwnDatasource = true
+			}
+		}
+
+		probeQueries := make([]probeQuery, len(queries))
+		for i, q := range queries {
+			pq := probeQuery{
+				RefID: makeRefID(i),
+				query: q,
+			}
+
+			if isOwnDatasource {
+				pq.Datasource = q.Datasource()
+			}
+			probeQueries[i] = pq
+		}
+
+		var datasource string
+		if isOwnDatasource {
+			datasource = mixedDatasource
+		} else {
+			if len(queries) > 0 {
+				datasource = queries[0].Datasource()
+			}
+		}
+
+		jp.queriesOptions = &queriesOptions{
+			Queries:    probeQueries,
+			Datasource: datasource,
+		}
+	}
+
 	return json.Marshal(jp)
 }
 
-type probeQuery struct {
-	// PrometheusQuery
-	IntervalFactor *uint   `json:"intervalFactor"`
-	Expression     *string `json:"expr"`
-
-	// GraphiteQuery fields
-	Target *string `json:"target"`
-
-	query Query
+// QueryablePanel is interface for panels that supports quering metrics from datasources.
+type QueryablePanel interface {
+	Queries() *[]panel.Query
 }
 
+const mixedDatasource = "-- Mixed --"
+
+type queriesOptions struct {
+	Datasource string       `json:"datasource,omitempty"`
+	Queries    []probeQuery `json:"targets"`
+}
+
+// probeQuery is an auxiliary entity thats purpose to manage marshaling and unmarshal of panel's query into concrete
+// types.
+type probeQuery struct {
+	RefID      string `json:"refid"`
+	Datasource string `json:"datasource,omitempty"`
+
+	query panel.Query
+}
+
+// UnmarshalJSON implements json.Unmarshaler interface
 func (q *probeQuery) UnmarshalJSON(data []byte) error {
 	type JSONQuery probeQuery
-	var jq JSONQuery
+	jq := struct {
+		*JSONQuery
+
+		// Prometheus query fields
+		IntervalFactor *uint   `json:"intervalFactor"`
+		Expression     *string `json:"expr"`
+
+		// Graphite queryfields
+		Target *string `json:"target"`
+	}{
+		JSONQuery: (*JSONQuery)(q),
+	}
 	if err := json.Unmarshal(data, &jq); err != nil {
 		return err
 	}
 
-	//var query Query
-	//if jq.Expression != nil && jq.IntervalFactor != nil {
-	//	query = new(PrometheusQuery)
-	//} else if jq.Target != nil {
-	//	query = new(GraphiteQuery)
-	//}
+	// There is no any information about query type in Grafana's JSON object. Further more, some queries uses the same
+	// fields. Thus we need to use some heurisitcs to map json fields into our query types properly.
+	// This heurisitcs based on searching specific for query type fields in JSON data.
+	var query panel.Query
+	if jq.Expression != nil && jq.IntervalFactor != nil {
+		query = new(panelQuery.Prometheus)
+	} else if jq.Target != nil {
+		query = new(panelQuery.Graphite)
+	}
 
 	// TODO: Initialize Unknown query here instead
-	//if query == nil {
-	//	return nil
-	//}
-
-	//if err := json.Unmarshal(data, &query); err != nil {
-	//	return err
-	//}
-
-	//q.query = query
-	return nil
-}
-
-type Query interface {
-	RefID() string
-	Datasource() string
-	//commonOptions() *query.commonQuery
-}
-
-// PanelQueriesOptions is a part of panel that placed in 'Metrics' tab. It represents set of panel queries.
-type PanelQueriesOptions struct {
-	Datasource string  `json:"datasource,omitempty"`
-	Queries    []Query `json:"targets"`
-}
-
-func (o *PanelQueriesOptions) UnmarshalJSON(data []byte) error {
-	type JSONOptions PanelQueriesOptions
-
-	var queries []*probeQuery
-	jo := struct {
-		*JSONOptions
-		Queries *[]*probeQuery `json:"targets,omitempty"`
-	}{
-		JSONOptions: (*JSONOptions)(o),
-		Queries:     &queries,
+	if query == nil {
+		return nil
 	}
-	if err := json.Unmarshal(data, &jo); err != nil {
+
+	if err := json.Unmarshal(data, &query); err != nil {
 		return err
 	}
 
-	//o.Queries = []Query{}
-	//for _, q := range queries {
-	//	// TODO: queies shouldn't be nil in future. This check will be obsolete
-	//	if q.query == nil {
-	//		continue
-	//	}
-	//	o.Queries = append(o.Queries, q.query)
-	//}
-
+	q.query = query
 	return nil
 }
 
-// MarshalJSON implements encoding/json.Marshaler
-func (o *PanelQueriesOptions) MarshalJSON() ([]byte, error) {
-	type JSONOptions PanelQueriesOptions
-	jo := (*JSONOptions)(o)
+// MarshalJSON implements json.Marshaler interface
+func (q *probeQuery) MarshalJSON() ([]byte, error) {
+	type JSONQuery probeQuery
+	jq := struct {
+		*JSONQuery
+		*panelQuery.Prometheus
+		*panelQuery.Graphite
+	}{
+		JSONQuery: (*JSONQuery)(q),
+	}
 
-	// FIXME: add checking for uniqueness of refids
-	//for i, q := range jo.Queries {
-	//	if q.commonOptions().RefID != "" {
-	//		continue
-	//	}
-	//	q.commonOptions().RefID = makeRefID(i)
-	//}
+	switch v := q.query.(type) {
+	case *panelQuery.Prometheus:
+		jq.Prometheus = v
+	case *panelQuery.Graphite:
+		jq.Graphite = v
+	}
 
-	// TODO: if there are a several types of datasources we need to set 'main' datasouce to "Mixed"
-
-	return json.Marshal(jo)
+	return json.Marshal(jq)
 }
 
 // makeRefID returns symbolic ID for given index.
