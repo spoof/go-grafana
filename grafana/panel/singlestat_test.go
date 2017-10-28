@@ -58,7 +58,7 @@ func TestSinglestat_MarshalJSON(t *testing.T) {
 
 	got, err := json.MarshalIndent(panel, "", "\t\t")
 	if err != nil {
-		t.Fatalf("TextPanel.MarshalJSON returned error %s", err)
+		t.Fatalf("Singlestat.MarshalJSON returned error %s", err)
 	}
 	expected := []byte(`{
 		"valueName": "max",
