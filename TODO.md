@@ -25,7 +25,7 @@
         - [ ] Alert List
         - [ ] Dashboard List
         - [ ] Plugin List
-    - [ ] Template Variables
+    - [ ] Template Variables (milestone v0.1)
     - [ ] Annotations
 - [ ] Datasources
     - [ ] Prometheus (milestone v0.1)
