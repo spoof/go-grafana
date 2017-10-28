@@ -13,8 +13,17 @@
 
 package panel
 
+import (
+	"encoding/json"
+	"errors"
+
+	"github.com/spoof/go-grafana/pkg/field"
+)
+
 // Graph represents Graph panel
 type Graph struct {
+	YAxes GraphYaxesOptions `json:"yaxes"`
+
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
 	queries []Query
@@ -33,4 +42,37 @@ func (p *Graph) GeneralOptions() *GeneralOptions {
 // Queries implements Queryable interface
 func (p *Graph) Queries() *[]Query {
 	return &p.queries
+}
+
+type GraphYaxesOptions struct {
+	Left  GraphYAxis
+	Right GraphYAxis
+}
+
+func (axe *GraphYaxesOptions) MarshalJSON() ([]byte, error) {
+	axes := []GraphYAxis{axe.Left, axe.Right}
+	return json.Marshal(axes)
+}
+func (axe *GraphYaxesOptions) UnmarshalJSON(data []byte) error {
+	var axes []GraphYAxis
+	if err := json.Unmarshal(data, &axes); err != nil {
+		return err
+	}
+	if len(axes) < 2 {
+		return errors.New("Axes should be 2")
+	}
+
+	axe.Left = axes[0]
+	axe.Right = axes[1]
+
+	return nil
+}
+
+type GraphYAxis struct {
+	Format  string             `json:"format"`
+	Label   string             `json:"label,omitempty"`
+	LogBase int                `json:"logBase"`
+	Max     *field.ForceString `json:"max"`
+	Min     *field.ForceString `json:"min"`
+	Show    bool               `json:"show"`
 }
