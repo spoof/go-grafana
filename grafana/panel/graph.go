@@ -107,8 +107,7 @@ type Graph struct {
 	} `json:"tooltip"`
 
 	SeriesOverrides []GraphSeriesOverride `json:"seriesOverrides"`
-
-	Thresholds []Threshold `json:"thresholds"`
+	Thresholds      []Threshold           `json:"thresholds"`
 
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
@@ -182,7 +181,7 @@ type GraphYAxis struct {
 type GraphSeriesOverride struct {
 	Alias         string        `json:"alias"`
 	Bars          *bool         `json:"bars"`
-	Color         string        `json:"color,omitempty"`
+	Color         string        `json:"color,omitempty"` // TODO: replace with custom field
 	Dashes        *bool         `json:"dashes"`
 	DashLength    *uint         `json:"dashLength"`
 	DashSpace     *uint         `json:"spaceLength"`
@@ -207,5 +206,5 @@ type Threshold struct {
 	Line  bool          `json:"line"`
 	Op    operator      `json:"op"`
 	Value int           `json:"value"`
-	Color string        `json:"lineColor,omitempty"`
+	Color string        `json:"lineColor,omitempty"` // TODO: replace with custom field
 }
