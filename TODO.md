@@ -9,8 +9,8 @@
             - [x] Metrics
             - [x] Options
             - [ ] Value Mappings
-            - [ ] Time Range
-        - [ ] Graph (milestone v0.1)
+            - [x] Time Range
+        - [x] Graph (milestone v0.1)
             - [x] General
             - [x] Metrics
             - [x] Axes
@@ -19,7 +19,7 @@
                 - [x] Draw Options
                 - [x] Series Overrides
                 - [x] Thresholds
-            - [ ] Time Range
+            - [x] Time Range
         - [ ] Table
         - [ ] Heatmap
         - [ ] Alert List
