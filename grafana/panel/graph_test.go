@@ -87,6 +87,17 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			Transform:     "negative-y",
 		},
 	}
+	p.Thresholds = []Threshold{
+		Threshold{
+			Mode:  CustomThresholdMode,
+			Fill:  true,
+			Line:  true,
+			Op:    GreaterOp,
+			Value: 1,
+			Color: "rgb(77, 58, 58)",
+		},
+	}
+
 	got, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
@@ -162,6 +173,14 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			"yaxis": 1,
 			"zindex": -2,
 			"transform": "negative-y"
+		}],
+		"thresholds": [{
+			"colorMode": "custom",
+			"fill": true,
+			"line": true,
+			"lineColor": "rgb(77, 58, 58)",
+			"op": "gt",
+			"value": 1
 		}]
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
@@ -243,6 +262,14 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			"yaxis": 1,
 			"zindex": -2,
 			"transform": "negative-y"
+		}],
+		"thresholds": [{
+			"colorMode": "custom",
+			"fill": true,
+			"line": true,
+			"lineColor": "rgb(77, 58, 58)",
+			"op": "gt",
+			"value": 1
 		}]
 	}`)
 	var graph Graph
@@ -324,6 +351,17 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			YAxis:         uintRef(1),
 			ZIndex:        intRef(-2),
 			Transform:     "negative-y",
+		},
+	}
+	// Thresholds
+	expected.Thresholds = []Threshold{
+		Threshold{
+			Mode:  CustomThresholdMode,
+			Fill:  true,
+			Line:  true,
+			Op:    GreaterOp,
+			Value: 1,
+			Color: "rgb(77, 58, 58)",
 		},
 	}
 

@@ -52,6 +52,22 @@ const (
 	NullAsZeroPointMode    nullPointMode = "null as zero"
 )
 
+type thresholdMode string
+
+const (
+	CustomThresholdMode   thresholdMode = "custom"
+	CriticalThresholdMode thresholdMode = "critical"
+	WarningThresholdMode  thresholdMode = "warning"
+	OKThresholdMode       thresholdMode = "ok"
+)
+
+type operator string
+
+const (
+	GreaterOp operator = "gt"
+	LessOp    operator = "lt"
+)
+
 // Graph represents Graph panel
 type Graph struct {
 	// Axes
@@ -91,6 +107,8 @@ type Graph struct {
 	} `json:"tooltip"`
 
 	SeriesOverrides []GraphSeriesOverride `json:"seriesOverrides"`
+
+	Thresholds []Threshold `json:"thresholds"`
 
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
@@ -181,4 +199,13 @@ type GraphSeriesOverride struct {
 	YAxis         *uint         `json:"yaxis"`
 	ZIndex        *int          `json:"zindex"`
 	Transform     string        `json:"transform"` // always 'negative-y'
+}
+
+type Threshold struct {
+	Mode  thresholdMode `json:"colorMode"`
+	Fill  bool          `json:"fill"`
+	Line  bool          `json:"line"`
+	Op    operator      `json:"op"`
+	Value int           `json:"value"`
+	Color string        `json:"lineColor,omitempty"`
 }
