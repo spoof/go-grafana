@@ -15,10 +15,10 @@
             - [x] Metrics
             - [x] Axes
             - [x] Legend
-            - [ ] Display
-                - [ ] Draw Options
-                - [ ] Series Overrides
-                - [ ] Thresholds
+            - [x] Display
+                - [x] Draw Options
+                - [x] Series Overrides
+                - [x] Thresholds
             - [ ] Time Range
         - [ ] Table
         - [ ] Heatmap
