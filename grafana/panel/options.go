@@ -14,6 +14,7 @@
 package panel
 
 import (
+	"github.com/guregu/null"
 	"github.com/spoof/go-grafana/pkg/field"
 )
 
@@ -61,4 +62,10 @@ func NewPanelLink(linkType panelLinkType) *PanelLink {
 // Query is interface describes behaviour that we want from panel's queries
 type Query interface {
 	Datasource() string
+}
+
+type TimeRangeOptions struct {
+	From         null.String `json:"timeFrom"`
+	Shift        null.String `json:"timeShift"`
+	HideOverride bool        `json:"hideTimeOverride"`
 }

@@ -97,6 +97,12 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			Color: "rgb(77, 58, 58)",
 		},
 	}
+	// Time range
+	p.TimeRangeOptions = TimeRangeOptions{
+		From:         null.StringFrom("1h"),
+		Shift:        null.StringFromPtr(nil),
+		HideOverride: true,
+	}
 
 	got, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
@@ -181,7 +187,11 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			"lineColor": "rgb(77, 58, 58)",
 			"op": "gt",
 			"value": 1
-		}]
+		}],
+
+		"timeFrom": "1h",
+		"timeShift": null,
+		"hideTimeOverride": true
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
@@ -270,7 +280,11 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			"lineColor": "rgb(77, 58, 58)",
 			"op": "gt",
 			"value": 1
-		}]
+		}],
+
+		"timeFrom": "1h",
+		"timeShift": null,
+		"hideTimeOverride": true
 	}`)
 	var graph Graph
 	err := json.Unmarshal(data, &graph)
@@ -363,6 +377,13 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			Value: 1,
 			Color: "rgb(77, 58, 58)",
 		},
+	}
+
+	// Time range
+	expected.TimeRangeOptions = TimeRangeOptions{
+		From:         null.StringFrom("1h"),
+		Shift:        null.StringFromPtr(nil),
+		HideOverride: true,
 	}
 
 	if !reflect.DeepEqual(expected, &graph) {

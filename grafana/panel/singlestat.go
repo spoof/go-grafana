@@ -50,6 +50,8 @@ type Singlestat struct {
 		ThresholdMarkers bool `json:"thresholdMarkers"`
 	} `json:"gauge"`
 
+	TimeRangeOptions
+
 	generalOptions GeneralOptions
 	queries        []Query
 }

@@ -109,9 +109,11 @@ type Graph struct {
 	SeriesOverrides []GraphSeriesOverride `json:"seriesOverrides"`
 	Thresholds      []Threshold           `json:"thresholds"`
 
+	// Time range
+	TimeRangeOptions
+
 	generalOptions GeneralOptions
-	//queriesOptions QueriesOptions
-	queries []Query
+	queries        []Query
 }
 
 // NewGraph creates new Graph panel.
