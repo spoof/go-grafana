@@ -64,8 +64,9 @@ const (
 type operator string
 
 const (
-	GreaterOp operator = "gt"
-	LessOp    operator = "lt"
+	EqualSignOp operator = "="
+	GreaterOp   operator = "gt"
+	LessOp      operator = "lt"
 )
 
 // Graph represents Graph panel

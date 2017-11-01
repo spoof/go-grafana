@@ -13,6 +13,16 @@
 
 package panel
 
+import "encoding/json"
+
+type valueMappingType uint
+
+const (
+	_ valueMappingType = iota
+	ValueToTextType
+	RangeToTextType
+)
+
 // Singlestat  represents Singlestat panel.
 type Singlestat struct {
 
@@ -50,6 +60,7 @@ type Singlestat struct {
 		ThresholdMarkers bool `json:"thresholdMarkers"`
 	} `json:"gauge"`
 
+	ValueMappings
 	TimeRangeOptions
 
 	generalOptions GeneralOptions
@@ -69,4 +80,35 @@ func (p *Singlestat) GeneralOptions() *GeneralOptions {
 // Queries implements Queryable interface
 func (p *Singlestat) Queries() *[]Query {
 	return &p.queries
+}
+
+type ValueMappings struct {
+	Type        valueMappingType     `json:"mappingType"`
+	ValueToText []ValueToTextMapping `json:"valueMaps"`
+	RangeToText []RangeToTextMapping `json:"rangeMaps"`
+}
+
+type ValueToTextMapping struct {
+	Text  string `json:"text"`
+	Value string `json:"value"`
+}
+
+// MarshalJSON implements json.Marshaler interface
+func (m ValueToTextMapping) MarshalJSON() ([]byte, error) {
+	type JSONMapping ValueToTextMapping
+	jm := struct {
+		Op operator `json:"op"`
+		JSONMapping
+	}{
+		Op:          EqualSignOp,
+		JSONMapping: JSONMapping(m),
+	}
+
+	return json.Marshal(jm)
+}
+
+type RangeToTextMapping struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+	Text string `json:"text"`
 }

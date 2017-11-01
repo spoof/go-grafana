@@ -64,6 +64,16 @@ func TestSinglestat_MarshalJSON(t *testing.T) {
 		HideOverride: true,
 	}
 
+	p.ValueMappings = panel.ValueMappings{
+		Type: panel.ValueToTextType,
+		ValueToText: []panel.ValueToTextMapping{
+			panel.ValueToTextMapping{Text: "one", Value: "1"},
+		},
+		RangeToText: []panel.RangeToTextMapping{
+			panel.RangeToTextMapping{From: "1", To: "10", Text: "one to ten"},
+		},
+	}
+
 	got, err := json.MarshalIndent(p, "", "\t\t")
 	if err != nil {
 		t.Fatalf("Singlestat.MarshalJSON returned error %s", err)
@@ -100,12 +110,24 @@ func TestSinglestat_MarshalJSON(t *testing.T) {
 
 		"timeFrom": "1h",
 		"timeShift": null,
-		"hideTimeOverride": true
+		"hideTimeOverride": true,
+
+		"mappingType": 1,
+		"valueMaps": [{
+			"op": "=",
+			"text": "one",
+			"value": "1"
+		}],
+		"rangeMaps": [{
+			"from": "1",
+			"to": "10",
+			"text": "one to ten"
+		}]
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
 		t.Fatalf("Singlestat.MarshalJSON returned error %s", err)
 	} else if !eq {
-		t.Errorf("Singlestat.MarshalJSON: %s", pretty.Diff(expected, &got))
+		t.Errorf("Singlestat.MarshalJSON:\ngot %s\nwant: %s", expected, got)
 	}
 }
 
@@ -141,6 +163,17 @@ func TestSinglestat_UnmarshalJSON(t *testing.T) {
 		HideOverride: true,
 	}
 
+	// Value mapping
+	expected.ValueMappings = panel.ValueMappings{
+		Type: panel.RangeToTextType,
+		ValueToText: []panel.ValueToTextMapping{
+			panel.ValueToTextMapping{Text: "one", Value: "1"},
+		},
+		RangeToText: []panel.RangeToTextMapping{
+			panel.RangeToTextMapping{From: "1", To: "10", Text: "one to ten"},
+		},
+	}
+
 	data := []byte(`{
 		"valueName": "max",
 		"valueFontSize": "50%",
@@ -173,7 +206,19 @@ func TestSinglestat_UnmarshalJSON(t *testing.T) {
 
 		"timeFrom": "1h",
 		"timeShift": null,
-		"hideTimeOverride": true
+		"hideTimeOverride": true,
+
+		"mappingType": 2,
+		"valueMaps": [{
+			"op": "=",
+			"text": "one",
+			"value": "1"
+		}],
+		"rangeMaps": [{
+			"from": "1",
+			"to": "10",
+			"text": "one to ten"
+		}]
 	}`)
 	var got panel.Singlestat
 	err := json.Unmarshal(data, &got)
