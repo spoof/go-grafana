@@ -64,7 +64,29 @@ func TestGraph_MarshalJSON(t *testing.T) {
 	p.Tooltip.StackedValue = Individual
 	p.DrawOptions.Stack = true
 	p.DrawOptions.NullValue = NullAsZeroPointMode
-
+	p.SeriesOverrides = []GraphSeriesOverride{
+		GraphSeriesOverride{
+			Alias:         "/yo/",
+			Bars:          boolRef(true),
+			Color:         "#E5A8E2",
+			Dashes:        boolRef(true),
+			DashLength:    uintRef(10),
+			DashSpace:     uintRef(2),
+			FillBelowTo:   "x",
+			Legend:        boolRef(true),
+			Lines:         boolRef(true),
+			LineFill:      uintRef(2),
+			LineWidth:     uintRef(2),
+			NullPointMode: NullAsZeroPointMode,
+			Points:        boolRef(true),
+			PointRadius:   uintRef(2),
+			Staircase:     boolRef(true),
+			Stack:         "A",
+			YAxis:         uintRef(1),
+			ZIndex:        intRef(-2),
+			Transform:     "negative-y",
+		},
+	}
 	got, err := json.MarshalIndent(p, "", "\t")
 	if err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
@@ -119,7 +141,28 @@ func TestGraph_MarshalJSON(t *testing.T) {
 			"shared": true,
 			"sort": 2,
 			"value_type": "individual"
-		}
+		},
+		"seriesOverrides": [{
+			"alias": "/yo/",
+			"bars": true,
+			"color": "#E5A8E2",
+			"dashes": true,
+			"dashLength": 10,
+			"spaceLength": 2,
+			"fillBelowTo": "x",
+			"legend": true,
+			"lines": true,
+			"fill": 2,
+			"linewidth": 2,
+			"nullPointMode": "null as zero",
+			"points": true,
+			"pointradius": 2,
+			"steppedLine": true,
+			"stack": "A",
+			"yaxis": 1,
+			"zindex": -2,
+			"transform": "negative-y"
+		}]
 	}`)
 	if eq, err := jsontools.BytesEqual(expected, got); err != nil {
 		t.Fatalf("Graph.MarshalJSON returned error %s", err)
@@ -178,8 +221,29 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 			"shared": true,
 			"sort": 1,
 			"value_type": "cumulative"
-		}
-
+		},
+		"seriesOverrides": [{
+			"alias": "/yo/",
+			"dashes": true,
+			"bars": true,
+			"color": "#E5A8E2",
+			"dashes": true,
+			"dashLength": 10,
+			"fillBelowTo": "x",
+			"legend": true,
+			"lines": true,
+			"fill": 2,
+			"linewidth": 2,
+			"nullPointMode": "null as zero",
+			"points": true,
+			"pointradius": 2,
+			"steppedLine": true,
+			"spaceLength": 2,
+			"stack": "A",
+			"yaxis": 1,
+			"zindex": -2,
+			"transform": "negative-y"
+		}]
 	}`)
 	var graph Graph
 	err := json.Unmarshal(data, &graph)
@@ -238,7 +302,44 @@ func TestGraph_UnmarshalJSON(t *testing.T) {
 	expected.DrawOptions.Stack = true
 	expected.DrawOptions.NullValue = ConnectedNullPointMode
 
+	// Series Overrides
+	expected.SeriesOverrides = []GraphSeriesOverride{
+		GraphSeriesOverride{
+			Alias:         "/yo/",
+			Bars:          boolRef(true),
+			Color:         "#E5A8E2",
+			Dashes:        boolRef(true),
+			DashLength:    uintRef(10),
+			DashSpace:     uintRef(2),
+			FillBelowTo:   "x",
+			Legend:        boolRef(true),
+			Lines:         boolRef(true),
+			LineFill:      uintRef(2),
+			LineWidth:     uintRef(2),
+			NullPointMode: NullAsZeroPointMode,
+			Points:        boolRef(true),
+			PointRadius:   uintRef(2),
+			Staircase:     boolRef(true),
+			Stack:         "A",
+			YAxis:         uintRef(1),
+			ZIndex:        intRef(-2),
+			Transform:     "negative-y",
+		},
+	}
+
 	if !reflect.DeepEqual(expected, &graph) {
 		t.Errorf("Graph.UnmarshalJSON: %s", pretty.Diff(expected, &graph))
 	}
+}
+
+func boolRef(b bool) *bool {
+	return &b
+}
+
+func intRef(i int) *int {
+	return &i
+}
+
+func uintRef(i uint) *uint {
+	return &i
 }

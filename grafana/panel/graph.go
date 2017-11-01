@@ -90,6 +90,8 @@ type Graph struct {
 		StackedValue stackedValueType `json:"value_type"`
 	} `json:"tooltip"`
 
+	SeriesOverrides []GraphSeriesOverride `json:"seriesOverrides"`
+
 	generalOptions GeneralOptions
 	//queriesOptions QueriesOptions
 	queries []Query
@@ -157,4 +159,26 @@ type GraphYAxis struct {
 	Max     *field.ForceString `json:"max"`
 	Min     *field.ForceString `json:"min"`
 	Show    bool               `json:"show"`
+}
+
+type GraphSeriesOverride struct {
+	Alias         string        `json:"alias"`
+	Bars          *bool         `json:"bars"`
+	Color         string        `json:"color,omitempty"`
+	Dashes        *bool         `json:"dashes"`
+	DashLength    *uint         `json:"dashLength"`
+	DashSpace     *uint         `json:"spaceLength"`
+	FillBelowTo   string        `json:"fillBelowTo,omitempty"`
+	Legend        *bool         `json:"legend"`
+	Lines         *bool         `json:"lines"`
+	LineFill      *uint         `json:"fill"`
+	LineWidth     *uint         `json:"linewidth"`
+	NullPointMode nullPointMode `json:"nullPointMode,omitempty"`
+	Points        *bool         `json:"points,omitempty"`
+	PointRadius   *uint         `json:"pointradius"`
+	Staircase     *bool         `json:"steppedLine"`
+	Stack         string        `json:"stack"` // could be bool (true/false)
+	YAxis         *uint         `json:"yaxis"`
+	ZIndex        *int          `json:"zindex"`
+	Transform     string        `json:"transform"` // always 'negative-y'
 }
