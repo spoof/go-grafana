@@ -4,11 +4,11 @@
         - [x] Text (milestone v0.1)
             - [x] General
             - [x] Options
-        - [ ] Singlestat (milestone v0.1)
+        - [x] Singlestat (milestone v0.1)
             - [x] General
             - [x] Metrics
             - [x] Options
-            - [ ] Value Mappings
+            - [x] Value Mappings
             - [x] Time Range
         - [x] Graph (milestone v0.1)
             - [x] General
