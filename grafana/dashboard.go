@@ -134,10 +134,6 @@ type DashboardMeta struct {
 	UpdatedBy string    `json:"updatedBy"`
 }
 
-func (dm *DashboardMeta) String() string {
-	return Stringify(dm)
-}
-
 // Row is panel's row
 type Row struct {
 	Collapsed bool              `json:"collapse"`

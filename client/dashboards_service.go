@@ -156,7 +156,3 @@ type DashboardHit struct {
 	Tags      []string `json:"tags"`
 	IsStarred bool     `json:"isStarred"`
 }
-
-func (dh *DashboardHit) String() string {
-	return grafana.Stringify(dh)
-}

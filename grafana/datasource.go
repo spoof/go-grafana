@@ -66,11 +66,6 @@ func (d *Datasource) ID() DatasourceID {
 	return d.id
 }
 
-// String implements fmt.Stringer interface
-func (d *Datasource) String() string {
-	return Stringify(d)
-}
-
 // MarshalJSON implements json.Marshaler interface
 func (d *Datasource) MarshalJSON() ([]byte, error) {
 	type JSONDatasource Datasource
