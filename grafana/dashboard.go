@@ -46,6 +46,7 @@ type Dashboard struct {
 	Timezone     string         `json:"timezone"`
 	Title        string         `json:"title"`
 	Tags         *field.Tags    `json:"tags"`
+	Variables    Variables      `json:"templating"`
 
 	Meta *DashboardMeta `json:"-"`
 }

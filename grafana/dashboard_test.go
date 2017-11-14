@@ -91,6 +91,9 @@ func TestDashboard_MarshalJSON(t *testing.T) {
 		"editable": true,
 		"graphTooltip": 2,
 		"hideControls": true,
+		"templating": {
+			"list": []
+		},
 		"rows": [{
 			"collapse": true,
 			"editable": true,
