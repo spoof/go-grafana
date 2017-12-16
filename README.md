@@ -36,7 +36,7 @@ func main() {
 	row.Title = "Row"
 	row.ShowTitle = true
  
-  // Add Graph panel
+ 	// Add Graph panel
 	p := panel.NewGraph()
 	p.GeneralOptions().Height = "250px"
 	p.GeneralOptions().Span = 2
@@ -44,7 +44,7 @@ func main() {
 	p.YAxes.Left.Format = "short"
 	p.YAxes.Left.Show = true
 
-  // Graph panel with query to Prometheus datasource
+	// Graph panel with query to Prometheus datasource
 	q := query.NewPrometheus("Prometheus")
 	q.Expression = `up{job="job"}`
 	q.Interval = "1"
