@@ -3,7 +3,65 @@ go-grafana is a Go client library for [Grafana API](http://docs.grafana.org/http
 
 ## Installation
 ```
-go get github.com/spoof/go-grafana
+go get -u github.com/spoof/go-grafana
+```
+
+## Usage
+```go
+package main
+
+import (
+	"context"
+	"log"
+	"net/url"
+
+	"github.com/spoof/go-grafana/client"
+	"github.com/spoof/go-grafana/grafana"
+	"github.com/spoof/go-grafana/grafana/panel"
+	"github.com/spoof/go-grafana/grafana/query"
+)
+
+func main() {
+	const token = "<token>"
+	url, _ := url.Parse("http://localhost:3000/")
+	client := client.NewClient(url, token, nil)
+	ctx := context.Background()
+
+	// Create dashboard
+	d := grafana.NewDashboard("Title Demo")
+	d.Tags.Set("tag1", "tag2")
+
+	// Add row
+	row := grafana.NewRow()
+	row.Title = "Row"
+	row.ShowTitle = true
+ 
+  // Add Graph panel
+	p := panel.NewGraph()
+	p.GeneralOptions().Height = "250px"
+	p.GeneralOptions().Span = 2
+	p.XAxis.Show = true
+	p.YAxes.Left.Format = "short"
+	p.YAxes.Left.Show = true
+
+  // Graph panel with query to Prometheus datasource
+	q := query.NewPrometheus("Prometheus")
+	q.Expression = `up{job="job"}`
+	q.Interval = "1"
+	q.LegendFormat = "{{ instance }}"
+
+	queries := p.Queries()
+	*queries = []panel.Query{q}
+
+	row.Panels = append(row.Panels, p)
+	d.Rows = append(d.Rows, row)
+
+	overwrite := true
+	if err := client.Dashboards.Save(ctx, d, overwrite); err != nil {
+		log.Fatalf("Error while saving dashboard %s", err)
+	}
+
+}
 ```
 
 ## Current Status
