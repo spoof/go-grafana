@@ -8,7 +8,6 @@ install:
   - go get -u github.com/golang/dep/cmd/dep
   - dep ensure
 script:
-  - go get -t -v ./...
-  - diff -u <(echo -n) <(gofmt -d -s .)
-  - go tool vet .
-  - go test -v -race ./...
+  - make
+  - make verify
+  - make test
